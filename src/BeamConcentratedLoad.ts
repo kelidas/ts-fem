@@ -6,7 +6,7 @@ import { LabelType } from ".";
 
 /**
  * Implementation of Beam2d concentrated load
- * TODO: only Fx, Fz now - add concentrated moment support
+ * Beam2D lives in the XZ plane, so the only supported point moment is My.
  */
 export class BeamConcentratedLoad extends BeamElementLoad {
   values: number[]; // Fx, Fz, My, distance x
@@ -25,18 +25,20 @@ export class BeamConcentratedLoad extends BeamElementLoad {
   getGlobalIntensities() {
     const fx = this.values[0];
     const fz = this.values[1];
+    const my = this.values[2];
     if (this.lcs) {
       const geo = this.domain.getElement(this.target).computeGeo();
       const cos = geo.dx / geo.l;
       const sin = geo.dz / geo.l;
-      return { fx: fx * cos - fz * sin, fz: fx * sin + fz * cos, my: 0.0 };
+      return { fx: fx * cos - fz * sin, fz: fx * sin + fz * cos, my };
     } else {
-      return { fx: fx, fz: fz, my: 0.0 };
+      return { fx, fz, my };
     }
   }
   getLocalIntensities() {
     const fx = this.values[0];
     const fz = this.values[1];
+    const my = this.values[2];
     const geo = this.domain.getElement(this.target).computeGeo();
     const l = geo.l;
     const dx = geo.dx;
@@ -47,9 +49,10 @@ export class BeamConcentratedLoad extends BeamElementLoad {
       return {
         fx: fx * cos + fz * sin,
         fz: -fx * sin + fz * cos,
+        my,
       };
     } else {
-      return { fx: fx, fz: fz };
+      return { fx, fz, my };
     }
   }
 
@@ -58,6 +61,7 @@ export class BeamConcentratedLoad extends BeamElementLoad {
     const f = this.getLocalIntensities();
     const fx = f.fx;
     const fz = f.fz;
+    const my = f.my;
     const l = geo.l;
 
     const a = this.values[3];
@@ -65,11 +69,11 @@ export class BeamConcentratedLoad extends BeamElementLoad {
 
     return [
       (-b / l) * fx,
-      (b / l) * ((a * (a - b)) / l / l - 1) * fz,
-      ((a * b * b) / l / l) * fz,
+      (b / l) * ((a * (a - b)) / l / l - 1) * fz - (6 * a * b * my) / (l * l * l),
+      ((a * b * b) / l / l) * fz - (b * (b - 2 * a) * my) / (l * l),
       (-a / l) * fx,
-      (a / l) * ((b * (b - a)) / l / l - 1) * fz,
-      ((-a * a * b) / l / l) * fz,
+      (a / l) * ((b * (b - a)) / l / l - 1) * fz + (6 * a * b * my) / (l * l * l),
+      ((-a * a * b) / l / l) * fz - (a * (a - 2 * b) * my) / (l * l),
     ];
   }
 
@@ -83,22 +87,23 @@ export class BeamConcentratedLoad extends BeamElementLoad {
     const f = this.getLoadVectorForClampedBeam();
     if (elem.hasHinges()) {
       const stiffrec = elem.computeLocalStiffnessMtrx(true);
+      const a = stiffrec.a!;
+      const b = stiffrec.b!;
+      const kab = stiffrec.kab!;
+      const kbb = stiffrec.kbb!;
       let ans = [0, 0, 0, 0, 0, 0];
 
-      const h1 = math.multiply(stiffrec.kab, math.inv(stiffrec.kbb));
-      if (stiffrec.b.length == 1) {
-        const flv = f[stiffrec.b[0]];
-        for (let i = 0; i < stiffrec.a.length; i++) {
-          ans[stiffrec.a[i]] = f[stiffrec.a[i]] - h1.get([i, 0]) * flv;
+      const h1 = math.multiply(kab, math.inv(kbb));
+      if (b.length == 1) {
+        const flv = f[b[0]];
+        for (let i = 0; i < a.length; i++) {
+          ans[a[i]] = f[a[i]] - h1.get([i, 0]) * flv;
         }
 
         return math.multiply(math.multiply(math.transpose(t), ans), -1.0).toArray() as number[];
       } else {
-        const help = math.subtract(
-          math.subset(f, math.index(stiffrec.a)),
-          math.multiply(h1, math.subset(f, math.index(stiffrec.b)))
-        );
-        ans = math.subset(ans, math.index(stiffrec.a), help);
+        const help = math.subtract(math.subset(f, math.index(a)), math.multiply(h1, math.subset(f, math.index(b))));
+        ans = math.subset(ans, math.index(a), help);
         return math.multiply(math.multiply(math.transpose(t), ans), -1.0).toArray() as number[];
       }
     } else {
@@ -114,6 +119,7 @@ export class BeamConcentratedLoad extends BeamElementLoad {
 
     const Fxloc = f.fx;
     const Fzloc = f.fz;
+    const Myloc = f.my;
 
     const e = this.domain.getElement(this.target).getMaterial().e;
     const area = this.domain.getElement(this.target).getCS().a;
@@ -124,6 +130,8 @@ export class BeamConcentratedLoad extends BeamElementLoad {
 
     const Za = (b / l) * ((a * (a - b)) / l / l - 1) * Fzloc;
     const Ma = ((a * b * b) / l / l) * Fzloc;
+    const Va = (-6 * a * b * Myloc) / (l * l * l);
+    const Mya = (-b * (b - 2 * a) * Myloc) / (l * l);
     const EI = e * iy;
     const EA = e * area;
     const x = xl * l;
@@ -138,6 +146,12 @@ export class BeamConcentratedLoad extends BeamElementLoad {
       w = ((Za * Math.pow(x, 3)) / 6 + (Ma * Math.pow(x, 2)) / 2 + (Fzloc * Math.pow(x - a, 3)) / 6) / EI;
     } else {
       w = ((Za * Math.pow(x, 3)) / 6 + (Ma * Math.pow(x, 2)) / 2) / EI;
+    }
+
+    if (x > a) {
+      w += ((Va * Math.pow(x, 3)) / 6 + (Mya * Math.pow(x, 2)) / 2 + (Myloc * Math.pow(x - a, 2)) / 2) / EI;
+    } else {
+      w += ((Va * Math.pow(x, 3)) / 6 + (Mya * Math.pow(x, 2)) / 2) / EI;
     }
 
     return { u: u, w: w };
@@ -155,6 +169,6 @@ export class BeamConcentratedLoad extends BeamElementLoad {
   computeBeamMContrib(x: number): number {
     const f = this.getLocalIntensities();
     const a = this.values[3];
-    return x < a ? 0 : -f.fz * (x - a);
+    return x < a ? 0 : -f.fz * (x - a) - f.my;
   }
 }
