@@ -3,7 +3,7 @@ import { Domain } from "./Domain";
 import { LabelType } from ".";
 /**
  * Implementation of Beam2d concentrated load
- * TODO: only Fx, Fz now - add concentrated moment support
+ * Beam2D lives in the XZ plane, so the only supported point moment is My.
  */
 export declare class BeamConcentratedLoad extends BeamElementLoad {
     values: number[];
@@ -18,6 +18,7 @@ export declare class BeamConcentratedLoad extends BeamElementLoad {
     getLocalIntensities(): {
         fx: number;
         fz: number;
+        my: number;
     };
     getLoadVectorForClampedBeam(): Array<number>;
     getLocationArray(): number[];

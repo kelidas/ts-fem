@@ -1,4 +1,4 @@
-import { BeamElementLoad } from "./BeamElementLoad";
+import { BeamElementLoad, DistributedLoadPolynomial } from "./BeamElementLoad";
 import { Domain } from "./Domain";
 import { LabelType } from ".";
 /**
@@ -40,4 +40,5 @@ export declare class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
     computeBeamNContrib(x: number): number;
     computeBeamVContrib(x: number): number;
     computeBeamMContrib(x: number): number;
+    getDistributedLoadPolynomials(): DistributedLoadPolynomial[];
 }
