@@ -1,0 +1,189 @@
+import * as math from "mathjs";
+import { Beam2D } from "./Beam2D";
+import { BeamElementLoad } from "./BeamElementLoad";
+import { Domain } from "./Domain";
+import { LabelType } from ".";
+
+// Local Timoshenko beam stiffness matrix for an arbitrary sub-length, used to
+// split the element at the imposed deformation point (see getSegmentEndDisplacements).
+function computeLocalStiffness(l: number, e: number, g: number, area: number, iy: number, k: number): math.Matrix {
+  const l2 = l * l;
+  const l3 = l2 * l;
+  const fi = (12 * e * iy) / (k * g * area * l * l);
+  const fi1 = 1 + fi;
+  return math.matrix([
+    [(e * area) / l, 0, 0, -(e * area) / l, 0, 0],
+    [0, (12 * e * iy) / l3 / fi1, (-6 * e * iy) / l2 / fi1, 0, (-12 * e * iy) / l3 / fi1, (-6 * e * iy) / l2 / fi1],
+    [
+      0,
+      (-6 * e * iy) / l2 / fi1,
+      ((4 + fi) * e * iy) / l / fi1,
+      0,
+      (6 * e * iy) / l2 / fi1,
+      ((2 - fi) * e * iy) / l / fi1,
+    ],
+    [-(e * area) / l, 0, 0, (e * area) / l, 0, 0],
+    [0, (-12 * e * iy) / l3 / fi1, (6 * e * iy) / l2 / fi1, 0, (12 * e * iy) / l3 / fi1, (6 * e * iy) / l2 / fi1],
+    [
+      0,
+      (-6 * e * iy) / l2 / fi1,
+      ((2 - fi) * e * iy) / l / fi1,
+      0,
+      (6 * e * iy) / l2 / fi1,
+      ((4 + fi) * e * iy) / l / fi1,
+    ],
+  ]);
+}
+
+/**
+ * Implementation of Beam2D concentrated (imposed) relative deformation - a prescribed
+ * discontinuity in axial displacement, transverse displacement or rotation at an internal
+ * point of the element (a "dislocation"), as used e.g. by RFEM's "Member Imposed Deformation".
+ *
+ * Unlike a concentrated force/moment (which produces a jump in internal forces but a
+ * continuous deflection), an imposed deformation produces a jump in the deflection curve
+ * while internal forces (N, V, M) stay continuous. This makes it the standard tool for
+ * computing influence lines by the Müller-Breslau principle: release the DOF dual to the
+ * desired action (N, V or M) and impose a unit relative deformation of the matching type;
+ * the resulting deflected shape is the influence line for that action.
+ */
+export class BeamConcentratedDeformation extends BeamElementLoad {
+  values: number[]; // Du, Dw, Dphi, distance x
+  lcs: boolean;
+
+  constructor(elem: LabelType, domain: Domain, values: number[], lcs: boolean) {
+    super(elem, domain);
+    this.values = values;
+    this.lcs = lcs;
+  }
+  change(elem: LabelType, values: number[], lcs: boolean) {
+    this.target = elem.toString();
+    this.values = values;
+    this.lcs = lcs;
+  }
+
+  getLocalIntensities() {
+    const du = this.values[0];
+    const dw = this.values[1];
+    const dphi = this.values[2];
+    if (!this.lcs) {
+      const geo = this.domain.getElement(this.target).computeGeo();
+      const cos = geo.dx / geo.l;
+      const sin = geo.dz / geo.l;
+      return { du: du * cos + dw * sin, dw: -du * sin + dw * cos, dphi };
+    } else {
+      return { du, dw, dphi };
+    }
+  }
+
+  /**
+   * Splits the element into two sub-beams (length a and b=l-a) at the imposed deformation
+   * point and solves for the end displacements r_C1 (end of segment a) and r_C2 (start of
+   * segment b) that satisfy internal equilibrium for a clamped-clamped (r_A=r_B=0) beam
+   * with the prescribed relative jump r_C2-r_C1 = [Du, Dw, Dphi] enforced at the cut.
+   */
+  private getSegmentEndDisplacements() {
+    const elem = this.domain.getElement(this.target);
+    const geo = elem.computeGeo();
+    const l = geo.l;
+    const mat = elem.getMaterial();
+    const cs = elem.getCS();
+    const d = this.getLocalIntensities();
+
+    const a = this.values[3];
+    const b = l - a;
+
+    const ka = computeLocalStiffness(a, mat.e, mat.g, cs.a, cs.iy, cs.k);
+    const kb = computeLocalStiffness(b, mat.e, mat.g, cs.a, cs.iy, cs.k);
+
+    const kacEnd = ka.subset(math.index([0, 1, 2], [3, 4, 5]));
+    const kccA = ka.subset(math.index([3, 4, 5], [3, 4, 5]));
+    const kccB = kb.subset(math.index([0, 1, 2], [0, 1, 2]));
+    const kbcStart = kb.subset(math.index([3, 4, 5], [0, 1, 2]));
+
+    const d0 = [d.du, d.dw, d.dphi];
+    const rC1 = math.multiply(
+      math.multiply(math.inv(math.add(kccA, kccB)), kccB),
+      d0
+    ).valueOf() as number[];
+    rC1.forEach((v, i) => (rC1[i] = -v));
+    const rC2 = math.add(rC1, d0) as number[];
+
+    return { a, b, l, kacEnd, kbcStart, rC1, rC2 };
+  }
+
+  getLoadVectorForClampedBeam(): Array<number> {
+    const { kacEnd, kbcStart, rC1, rC2 } = this.getSegmentEndDisplacements();
+
+    const fA = math.multiply(kacEnd, rC1).valueOf() as number[];
+    const fB = math.multiply(kbcStart, rC2).valueOf() as number[];
+
+    return [fA[0], fA[1], fA[2], fB[0], fB[1], fB[2]];
+  }
+
+  getLocationArray(): number[] {
+    return this.domain.getElement(this.target).getLocationArray();
+  }
+
+  getLoadVector(): number[] {
+    const elem = <Beam2D>this.domain.getElement(this.target);
+    const t = elem.computeT();
+    const f = this.getLoadVectorForClampedBeam();
+    if (elem.hasHinges()) {
+      const stiffrec = elem.computeLocalStiffnessMtrx(true);
+      const a = stiffrec.a!;
+      const b = stiffrec.b!;
+      const kab = stiffrec.kab!;
+      const kbb = stiffrec.kbb!;
+      let ans = [0, 0, 0, 0, 0, 0];
+
+      const h1 = math.multiply(kab, math.inv(kbb));
+      if (b.length == 1) {
+        const flv = f[b[0]];
+        for (let i = 0; i < a.length; i++) {
+          ans[a[i]] = f[a[i]] - h1.get([i, 0]) * flv;
+        }
+
+        return math.multiply(math.multiply(math.transpose(t), ans), -1.0).toArray() as number[];
+      } else {
+        const help = math.subtract(math.subset(f, math.index(a)), math.multiply(h1, math.subset(f, math.index(b))));
+        ans = math.subset(ans, math.index(a), help);
+        return math.multiply(math.multiply(math.transpose(t), ans), -1.0).toArray() as number[];
+      }
+    } else {
+      return math.multiply(math.multiply(math.transpose(t), f), -1.0).toArray() as number[];
+    }
+  }
+
+  // Deflection of the clamped-clamped primary structure (r_A=r_B=0), interpolated with
+  // standard Hermite shape functions on each side of the imposed deformation point.
+  computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+    const { a, b, l, rC1, rC2 } = this.getSegmentEndDisplacements();
+    const x = xl * l;
+
+    if (x <= a) {
+      const xi = a === 0 ? 0 : x / a;
+      const u = xi * rC1[0];
+      const w = (3 * xi * xi - 2 * xi * xi * xi) * rC1[1] + a * (xi * xi - xi * xi * xi) * rC1[2];
+      return { u, w };
+    } else {
+      const xb = x - a;
+      const xi = b === 0 ? 0 : xb / b;
+      const u = (1 - xi) * rC2[0];
+      const w = (1.0 - 3.0 * xi * xi + 2.0 * xi * xi * xi) * rC2[1] + b * (-xi + 2.0 * xi * xi - xi * xi * xi) * rC2[2];
+      return { u, w };
+    }
+  }
+
+  // An imposed deformation is a "dislocation": it produces a jump in displacement, not
+  // in internal forces, so N, V and M stay continuous (no contribution to add here).
+  computeBeamNContrib(_x: number): number {
+    return 0;
+  }
+  computeBeamVContrib(_x: number): number {
+    return 0;
+  }
+  computeBeamMContrib(_x: number): number {
+    return 0;
+  }
+}

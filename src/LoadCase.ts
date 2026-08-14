@@ -5,6 +5,7 @@ import { BeamElementTrapezoidalEdgeLoad } from "./BeamElementTrapezoidalEdgeLoad
 import { Domain } from "./Domain";
 import { NodalLoad } from "./NodalLoad";
 import { PrescribedDisplacement } from "./PrescribedDisplacement";
+import { BeamConcentratedDeformation } from "./BeamConcentratedDeformation";
 import { BeamConcentratedLoad, DofID, LabelType } from ".";
 import { EnumDictionary } from ".";
 import { BeamTemperatureLoad } from "./BeamTemperatureLoad";
@@ -79,6 +80,12 @@ export class LoadCase {
 
   createBeamConcentratedLoad(elem: LabelType, values: number[], lcs: boolean) {
     const ans = new BeamConcentratedLoad(elem, this.domain, values, lcs);
+    this.elementLoadList.push(ans);
+    return ans;
+  }
+
+  createBeamConcentratedDeformation(elem: LabelType, values: number[], lcs: boolean) {
+    const ans = new BeamConcentratedDeformation(elem, this.domain, values, lcs);
     this.elementLoadList.push(ans);
     return ans;
   }

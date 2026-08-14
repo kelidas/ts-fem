@@ -3,6 +3,7 @@ import { Domain } from "./Domain";
 import { LoadCase } from "./LoadCase";
 import { DofID, LabelType } from ".";
 import { Element } from "./Element";
+import { BeamElementLoad } from "./BeamElementLoad";
 
 /**
  * Implementation of Timoshenko beam element in 2D (xz plane)
@@ -404,6 +405,28 @@ export class Beam2D extends Element {
     return fe;
   }
 
+  // Hermite-interpolated local deflection at normalized position xl in [0,1], plus load contributions
+  private evalLocalDeflAt(rl: math.Matrix, l: number, xl: number, eloads: Array<BeamElementLoad>) {
+    let w =
+      (1.0 - 3.0 * xl * xl + 2.0 * xl * xl * xl) * rl.get([1]) +
+      l * (-xl + 2.0 * xl * xl - xl * xl * xl) * rl.get([2]) +
+      (3.0 * xl * xl - 2.0 * xl * xl * xl) * rl.get([4]) +
+      l * (xl * xl - xl * xl * xl) * rl.get([5]);
+    let u = (1 - xl) * rl.get([0]) + xl * rl.get([3]);
+
+    for (const load of eloads) {
+      const c = load.computeBeamDeflectionContrib(xl);
+      w += c.w;
+      u += c.u;
+    }
+    return { u, w };
+  }
+
+  // Transforms a local (u,w) deflection pair to global c.s. using the element's cos/sin
+  private toGlobalDefl(u: number, w: number, c: number, s: number) {
+    return { u: u * c - w * s, w: w * c + u * s };
+  }
+
   /**
    * Computes nseg+1 values of local deflections
    * @param lc reference to load case
@@ -411,29 +434,16 @@ export class Beam2D extends Element {
    */
   computeLocalDefl(lc: LoadCase, nseg: number) {
     const rl = this.computeEndDisplacement(lc);
-    const u: number[] = [];
-    const w: number[] = [];
     const geo = this.computeGeo();
     const l = geo.l;
-
     const eloads = lc.getElementLoadsOnElement(this.label);
+
+    const u: number[] = [];
+    const w: number[] = [];
     for (let iseg = 0; iseg <= nseg; iseg++) {
-      const xl = iseg / nseg; // [0,1]
-      // components from end displacements
-      let wl =
-        (1.0 - 3.0 * xl * xl + 2.0 * xl * xl * xl) * rl.get([1]) +
-        l * (-xl + 2.0 * xl * xl - xl * xl * xl) * rl.get([2]) +
-        (3.0 * xl * xl - 2.0 * xl * xl * xl) * rl.get([4]) +
-        l * (xl * xl - xl * xl * xl) * rl.get([5]);
-      let ul = (1 - xl) * rl.get([0]) + xl * rl.get([3]);
-      // add contributions of loads
-      for (const load of eloads) {
-        const c = load.computeBeamDeflectionContrib(xl);
-        wl += c.w;
-        ul += c.u;
-      }
-      u.push(ul);
-      w.push(wl);
+      const d = this.evalLocalDeflAt(rl, l, iseg / nseg, eloads);
+      u.push(d.u);
+      w.push(d.w);
     }
     return { u: u, w: w };
   }
@@ -451,10 +461,37 @@ export class Beam2D extends Element {
     const ug = [];
     const wg = [];
     for (let i = 0; i <= nseg; i++) {
-      ug.push(ld.u[i] * c - ld.w[i] * s);
-      wg.push(ld.w[i] * c + ld.u[i] * s);
+      const g = this.toGlobalDefl(ld.u[i], ld.w[i], c, s);
+      ug.push(g.u);
+      wg.push(g.w);
     }
     return { u: ug, w: wg };
+  }
+
+  /**
+   * Computes local deflection at a single point along the element
+   * @param lc reference to load case
+   * @param x distance from element start (in local c.s.)
+   */
+  computeLocalDeflAt(lc: LoadCase, x: number) {
+    const rl = this.computeEndDisplacement(lc);
+    const geo = this.computeGeo();
+    const l = geo.l;
+    const eloads = lc.getElementLoadsOnElement(this.label);
+    return this.evalLocalDeflAt(rl, l, x / l, eloads);
+  }
+
+  /**
+   * Computes global deflection at a single point along the element
+   * @param lc reference to load case
+   * @param x distance from element start (in local c.s.)
+   */
+  computeGlobalDeflAt(lc: LoadCase, x: number) {
+    const ld = this.computeLocalDeflAt(lc, x);
+    const geo = this.computeGeo();
+    const c: number = geo.dx / geo.l;
+    const s: number = geo.dz / geo.l;
+    return this.toGlobalDefl(ld.u, ld.w, c, s);
   }
 
   /**

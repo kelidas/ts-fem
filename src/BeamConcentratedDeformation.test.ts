@@ -1,0 +1,79 @@
+import { Beam2D } from "./Beam2D";
+
+import { expect, test } from "vitest";
+import { LinearStaticSolver } from "./LinearStaticSolver";
+import { DofID } from ".";
+
+test("Simply supported beam - bending moment influence line via unit rotation dislocation", () => {
+  const solver = new LinearStaticSolver();
+  const L = 4;
+  const a = .1; // section where the influence line is evaluated
+
+  solver.domain.createNode(1, [0, 0, 0], [DofID.Dx, DofID.Dz]);
+  solver.domain.createNode(2, [L, 0, 0], [DofID.Dz]);
+
+  solver.domain.createBeam2D("1", [1, 2], 1, 1);
+
+  solver.domain.createMaterial("1", { e: 210000e6, g: 8.75e10, alpha: 12e-6, d: 4000 });
+  solver.domain.createCrossSection("1", { a: 1, iy: 8.356e-5, iz: 1.0, dyz: 999991.0, h: 1, k: 1e32, j: 99999.0 });
+
+  // unit relative rotation at x=a -> Muller-Breslau influence line for bending moment M(a)
+  solver.loadCases[0].createBeamConcentratedDeformation("1", [0, 0, 1, a], true);
+
+  solver.solve();
+
+  const beam = solver.domain.getElement("1") as Beam2D;
+  const deflection = beam.computeGlobalDefl(solver.loadCases[0], 20);
+
+  const b = L - a;
+  for (let i = 0; i <= 20; i++) {
+    const x = (L * i) / 20;
+    const expectedW = x <= a ? (x * b) / L : (a * (L - x)) / L;
+    expect(deflection.w[i]).toBeCloseTo(expectedW, 5);
+  }
+
+  console.log(deflection.w);
+
+  // internal forces stay continuous (no jump) since this is a "deformation" load, not a force
+  const M = beam.computeBendingMoment(solver.loadCases[0], 8);
+  const V = beam.computeShearForce(solver.loadCases[0], 8);
+  const N = beam.computeNormalForce(solver.loadCases[0], 8);
+  M.M.forEach((v) => expect(v).toBeCloseTo(0));
+  V.V.forEach((v) => expect(v).toBeCloseTo(0));
+  N.N.forEach((v) => expect(v).toBeCloseTo(0));
+});
+
+test("Cantilever - shear influence line via unit relative transverse displacement", () => {
+  const solver = new LinearStaticSolver();
+  const L = 4;
+  const a = 1.5;
+
+  solver.domain.createNode(1, [0, 0, 0], [DofID.Dx, DofID.Dz, DofID.Ry]);
+  solver.domain.createNode(2, [L, 0, 0], []);
+
+  solver.domain.createBeam2D("1", [1, 2], 1, 1);
+
+  solver.domain.createMaterial("1", { e: 210000e6, g: 8.75e10, alpha: 12e-6, d: 4000 });
+  solver.domain.createCrossSection("1", { a: 1, iy: 8.356e-5, iz: 1.0, dyz: 999991.0, h: 1, k: 1e32, j: 99999.0 });
+
+  // unit relative transverse displacement at x=a -> influence line for shear V(a)
+  solver.loadCases[0].createBeamConcentratedDeformation("1", [0, 1, 0, a], true);
+
+  solver.solve();
+
+  const beam = solver.domain.getElement("1") as Beam2D;
+  const deflection = beam.computeGlobalDefl(solver.loadCases[0], 8);
+
+  // fixed segment stays undeformed (V=M=0), then rigidly translates by the imposed jump
+  for (let i = 0; i <= 8; i++) {
+    const x = (L * i) / 8;
+    const expectedW = x <= a ? 0 : 1;
+    expect(deflection.w[i]).toBeCloseTo(expectedW, 5);
+  }
+  console.log(deflection.w);
+
+  const M = beam.computeBendingMoment(solver.loadCases[0], 8);
+  const V = beam.computeShearForce(solver.loadCases[0], 8);
+  M.M.forEach((v) => expect(v).toBeCloseTo(0));
+  V.V.forEach((v) => expect(v).toBeCloseTo(0));
+});
