@@ -38,7 +38,7 @@ function computeLocalStiffness(l: number, e: number, g: number, area: number, iy
 /**
  * Implementation of Beam2D concentrated (imposed) relative deformation - a prescribed
  * discontinuity in axial displacement, transverse displacement or rotation at an internal
- * point of the element (a "dislocation"), as used e.g. by RFEM's "Member Imposed Deformation".
+ * point of the element (a "dislocation") -- "Member Imposed Deformation".
  *
  * Unlike a concentrated force/moment (which produces a jump in internal forces but a
  * continuous deflection), an imposed deformation produces a jump in the deflection curve
@@ -48,6 +48,9 @@ function computeLocalStiffness(l: number, e: number, g: number, area: number, iy
  * the resulting deflected shape is the influence line for that action.
  */
 export class BeamConcentratedDeformation extends BeamElementLoad {
+  /** Below this fraction of the element length a sub-beam counts as having no length at all. */
+  private static readonly MIN_SEGMENT_RATIO = 1e-9;
+
   values: number[]; // Du, Dw, Dphi, distance x
   lcs: boolean;
 
@@ -92,6 +95,42 @@ export class BeamConcentratedDeformation extends BeamElementLoad {
 
     const a = this.values[3];
     const b = l - a;
+    const d0 = [d.du, d.dw, d.dphi];
+
+    // A point at either node leaves a zero length segment, whose stiffness is infinite, so the
+    // split below would be all NaN. Both cases are just the element itself with one end displaced
+    // by the imposed jump.
+    const tol = l * BeamConcentratedDeformation.MIN_SEGMENT_RATIO;
+
+    if (a <= tol || b <= tol) {
+      const k = computeLocalStiffness(l, mat.e, mat.g, cs.a, cs.iy, cs.k);
+
+      if (a <= tol) {
+        // the jump sits at the first node, so the element starts displaced by it
+        return {
+          a: 0,
+          b: l,
+          l,
+          kacEnd: k.subset(math.index([0, 1, 2], [0, 1, 2])),
+          kbcStart: k.subset(math.index([3, 4, 5], [0, 1, 2])),
+          rC1: d0,
+          rC2: d0,
+        };
+      }
+
+      // the jump sits at the second node, so the element ends displaced by minus the jump
+      const rEnd = d0.map((v) => -v);
+
+      return {
+        a: l,
+        b: 0,
+        l,
+        kacEnd: k.subset(math.index([0, 1, 2], [3, 4, 5])),
+        kbcStart: k.subset(math.index([3, 4, 5], [3, 4, 5])),
+        rC1: rEnd,
+        rC2: rEnd,
+      };
+    }
 
     const ka = computeLocalStiffness(a, mat.e, mat.g, cs.a, cs.iy, cs.k);
     const kb = computeLocalStiffness(b, mat.e, mat.g, cs.a, cs.iy, cs.k);
@@ -101,13 +140,12 @@ export class BeamConcentratedDeformation extends BeamElementLoad {
     const kccB = kb.subset(math.index([0, 1, 2], [0, 1, 2]));
     const kbcStart = kb.subset(math.index([3, 4, 5], [0, 1, 2]));
 
-    const d0 = [d.du, d.dw, d.dphi];
-    const rC1 = math.multiply(
-      math.multiply(math.inv(math.add(kccA, kccB)), kccB),
-      d0
-    ).valueOf() as number[];
-    rC1.forEach((v, i) => (rC1[i] = -v));
-    const rC2 = math.add(rC1, d0) as number[];
+    // Each side gets its own expression rather than rC2 = rC1 + d0: close to a node the two are
+    // nearly equal and opposite, and the sum loses every significant digit of the smaller one.
+    const kSumInv = math.inv(math.add(kccA, kccB));
+
+    const rC1 = (math.multiply(math.multiply(kSumInv, kccB), d0).valueOf() as number[]).map((v) => -v);
+    const rC2 = math.multiply(math.multiply(kSumInv, kccA), d0).valueOf() as number[];
 
     return { a, b, l, kacEnd, kbcStart, rC1, rC2 };
   }

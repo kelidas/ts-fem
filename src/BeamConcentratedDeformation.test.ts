@@ -132,3 +132,61 @@ test("Fixed-ended beam - shear force influence line via unit rotation dislocatio
     expect(deflection.w[i]).toBeCloseTo(expectedW, 5);
   }
 });
+const beamWithDeformationAt = (a: number) => {
+  const solver = new LinearStaticSolver();
+  const L = 4;
+
+  solver.domain.createNode(1, [0, 0, 0], [DofID.Dx, DofID.Dz]);
+  solver.domain.createNode(2, [L, 0, 0], [DofID.Dz]);
+  solver.domain.createBeam2D("1", [1, 2], 1, 1);
+  solver.domain.createMaterial("1", { e: 210000e6, g: 8.75e10, alpha: 12e-6, d: 4000 });
+  solver.domain.createCrossSection("1", { a: 1, iy: 8.356e-5, iz: 1.0, dyz: 999991.0, h: 1, k: 1e32, j: 99999.0 });
+  solver.loadCases[0].createBeamConcentratedDeformation("1", [0, -1, 0.5, a], true);
+
+  return { solver, L };
+};
+
+const endForcesAt = (a: number) => {
+  const { solver } = beamWithDeformationAt(a);
+  return solver.loadCases[0].elementLoadList[0].getLoadVectorForClampedBeam();
+};
+
+test("Deformation imposed at the element ends stays finite", () => {
+  const L = 4;
+
+  for (const a of [0, L]) {
+    endForcesAt(a).forEach((v) => expect(Number.isFinite(v)).toBe(true));
+  }
+});
+
+test("Deformation at the first node is the limit of one just inside it", () => {
+  const atNode = endForcesAt(0);
+  const justInside = endForcesAt(4 * 1e-6);
+
+  atNode.forEach((v, i) => {
+    const scale = Math.max(Math.abs(justInside[i]), 1);
+    expect(Math.abs(v - justInside[i]) / scale).toBeLessThan(1e-5);
+  });
+});
+
+test("Simply supported beam - unit rotation at either support gives a zero influence line", () => {
+  const L = 4;
+
+  // the bending moment at a support is zero, so its Muller-Breslau influence line is zero too
+  for (const a of [0, L]) {
+    const solver = new LinearStaticSolver();
+
+    solver.domain.createNode(1, [0, 0, 0], [DofID.Dx, DofID.Dz]);
+    solver.domain.createNode(2, [L, 0, 0], [DofID.Dz]);
+    solver.domain.createBeam2D("1", [1, 2], 1, 1);
+    solver.domain.createMaterial("1", { e: 210000e6, g: 8.75e10, alpha: 12e-6, d: 4000 });
+    solver.domain.createCrossSection("1", { a: 1, iy: 8.356e-5, iz: 1.0, dyz: 999991.0, h: 1, k: 1e32, j: 99999.0 });
+    solver.loadCases[0].createBeamConcentratedDeformation("1", [0, 0, 1, a], true);
+    solver.solve();
+
+    const beam = solver.domain.getElement("1") as Beam2D;
+    const deflection = beam.computeGlobalDefl(solver.loadCases[0], 10);
+
+    deflection.w.forEach((w) => expect(w).toBeCloseTo(0, 6));
+  }
+});
