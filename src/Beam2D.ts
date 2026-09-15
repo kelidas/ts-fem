@@ -482,6 +482,68 @@ export class Beam2D extends Element {
   }
 
   /**
+   * The slope of the deflection curve, dw/dx, at a normalized position.
+   *
+   * The Hermite polynomials of `evalLocalDeflAt` differentiated term by term. They are written in
+   * x/l, so each brings a factor of the length out with it - which is why the two translation terms
+   * are divided by it and the two rotation terms are not.
+   */
+  private evalLocalSlopeAt(rl: math.Matrix, l: number, xl: number, eloads: Array<BeamElementLoad>) {
+    let slope =
+      ((-6.0 * xl + 6.0 * xl * xl) * rl.get([1])) / l +
+      (-1.0 + 4.0 * xl - 3.0 * xl * xl) * rl.get([2]) +
+      ((6.0 * xl - 6.0 * xl * xl) * rl.get([4])) / l +
+      (2.0 * xl - 3.0 * xl * xl) * rl.get([5]);
+
+    for (const load of eloads) {
+      slope += load.computeBeamSlopeContrib(xl);
+    }
+
+    return slope;
+  }
+
+  /**
+   * Computes the rotation of the cross section at a single point along the element
+   *
+   * The rotation is minus the slope of the deflection curve, which is the convention the end
+   * displacement vector already uses: asked at either end, this returns the nodal rotation the
+   * solver found there.
+   *
+   * A rotation about y is the same number in the element's axes and in the global ones - turning
+   * the plane does not turn the section within it - so there is no global counterpart to this.
+   *
+   * @param lc reference to load case
+   * @param x distance from element start (in local c.s.)
+   */
+  computeLocalRotationAt(lc: LoadCase, x: number): number {
+    const rl = this.computeEndDisplacement(lc);
+    const geo = this.computeGeo();
+    const l = geo.l;
+    const eloads = lc.getElementLoadsOnElement(this.label);
+
+    return -this.evalLocalSlopeAt(rl, l, x / l, eloads);
+  }
+
+  /**
+   * Computes nseg+1 values of the cross section rotation
+   * @param lc reference to load case
+   * @param nseg rotation will be evaluated in nseg+1 points generated along the element
+   */
+  computeLocalRotation(lc: LoadCase, nseg: number): number[] {
+    const rl = this.computeEndDisplacement(lc);
+    const geo = this.computeGeo();
+    const l = geo.l;
+    const eloads = lc.getElementLoadsOnElement(this.label);
+
+    const phi: number[] = [];
+    for (let iseg = 0; iseg <= nseg; iseg++) {
+      phi.push(-this.evalLocalSlopeAt(rl, l, iseg / nseg, eloads));
+    }
+
+    return phi;
+  }
+
+  /**
    * Computes global deflection at a single point along the element
    * @param lc reference to load case
    * @param x distance from element start (in local c.s.)

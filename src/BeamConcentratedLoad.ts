@@ -156,6 +156,42 @@ export class BeamConcentratedLoad extends BeamElementLoad {
 
     return { u: u, w: w };
   }
+  /**
+   * The derivative of the deflection above. It is written in x already, so this is term by term -
+   * and the branch is the same one, which is what makes the slope one sided at the load: a force
+   * breaks the slope of the moment, and with it the curvature, but not the slope of the deflection,
+   * so the two sides agree here while the shear either side of it does not.
+   */
+  computeBeamSlopeContrib(xl: number): number {
+    const f = this.getLocalIntensities();
+    const elem = this.domain.elements.get(this.target)!;
+    const geo = elem.computeGeo();
+    const l = geo.l;
+
+    const Fzloc = f.fz;
+    const Myloc = f.my;
+
+    const e = this.domain.getElement(this.target).getMaterial().e;
+    const iy = this.domain.getElement(this.target).getCS().iy;
+
+    const a = this.values[3];
+    const b = l - a;
+
+    const Za = (b / l) * ((a * (a - b)) / l / l - 1) * Fzloc;
+    const Ma = ((a * b * b) / l / l) * Fzloc;
+    const Va = (-6 * a * b * Myloc) / (l * l * l);
+    const Mya = (-b * (b - 2 * a) * Myloc) / (l * l);
+    const EI = e * iy;
+    const x = xl * l;
+
+    let slope = ((Za * x * x) / 2 + Ma * x + (Va * x * x) / 2 + Mya * x) / EI;
+
+    if (x > a) {
+      slope += ((Fzloc * Math.pow(x - a, 2)) / 2 + Myloc * (x - a)) / EI;
+    }
+
+    return slope;
+  }
   computeBeamNContrib(x: number): number {
     const f = this.getLocalIntensities();
     const a = this.values[3];

@@ -88,6 +88,8 @@ export declare class Beam2D extends Element {
      * @param lc load case reference
      */
     computeEndForces(lc: LoadCase): math.Matrix;
+    private evalLocalDeflAt;
+    private toGlobalDefl;
     /**
      * Computes nseg+1 values of local deflections
      * @param lc reference to load case
@@ -105,6 +107,52 @@ export declare class Beam2D extends Element {
     computeGlobalDefl(lc: LoadCase, nseg: number): {
         u: number[];
         w: number[];
+    };
+    /**
+     * Computes local deflection at a single point along the element
+     * @param lc reference to load case
+     * @param x distance from element start (in local c.s.)
+     */
+    computeLocalDeflAt(lc: LoadCase, x: number): {
+        u: number;
+        w: number;
+    };
+    /**
+     * The slope of the deflection curve, dw/dx, at a normalized position.
+     *
+     * The Hermite polynomials of `evalLocalDeflAt` differentiated term by term. They are written in
+     * x/l, so each brings a factor of the length out with it - which is why the two translation terms
+     * are divided by it and the two rotation terms are not.
+     */
+    private evalLocalSlopeAt;
+    /**
+     * Computes the rotation of the cross section at a single point along the element
+     *
+     * The rotation is minus the slope of the deflection curve, which is the convention the end
+     * displacement vector already uses: asked at either end, this returns the nodal rotation the
+     * solver found there.
+     *
+     * A rotation about y is the same number in the element's axes and in the global ones - turning
+     * the plane does not turn the section within it - so there is no global counterpart to this.
+     *
+     * @param lc reference to load case
+     * @param x distance from element start (in local c.s.)
+     */
+    computeLocalRotationAt(lc: LoadCase, x: number): number;
+    /**
+     * Computes nseg+1 values of the cross section rotation
+     * @param lc reference to load case
+     * @param nseg rotation will be evaluated in nseg+1 points generated along the element
+     */
+    computeLocalRotation(lc: LoadCase, nseg: number): number[];
+    /**
+     * Computes global deflection at a single point along the element
+     * @param lc reference to load case
+     * @param x distance from element start (in local c.s.)
+     */
+    computeGlobalDeflAt(lc: LoadCase, x: number): {
+        u: number;
+        w: number;
     };
     /**
      * Computes element end displacement vector (in element local c.s.)

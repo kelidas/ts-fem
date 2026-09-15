@@ -113,6 +113,20 @@ export class BeamElementUniformEdgeLoad extends BeamElementLoad {
     const u = 0.0;
     return { u: u, w: w };
   }
+  /**
+   * The derivative of the deflection above, term by term: the fourth power falls to a third, and
+   * the factor of the length falls with it because the polynomial is in x/l and this is in x.
+   */
+  computeBeamSlopeContrib(xl: number): number {
+    const f = this.getLocalIntensities();
+    const elem = this.domain.elements.get(this.target);
+    const geo = elem.computeGeo();
+    const l = geo.l;
+
+    return (
+      (f.fz * l * l * l * ((xl * xl * xl) / 6 - (xl * xl) / 4 + xl / 12)) / (elem.getMaterial().e * elem.getCS().iy)
+    );
+  }
   computeBeamNContrib(x: number): number {
     const f = this.getLocalIntensities();
     return -f.fx * x;

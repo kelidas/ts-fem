@@ -130,6 +130,25 @@ export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
         return { u: 0.0, w };
     }
 
+    /** The derivative of the two polynomials above, in x rather than in x/l. */
+    computeBeamSlopeContrib(xl: number): number {
+        const elem = this.domain.getElement(this.target) as Beam2D;
+        const geo = elem.computeGeo();
+        const l = geo.l;
+        const intensities = this.getLocalIntensities();
+        const fz0 = intensities.start.fz;
+        const fz1 = intensities.end.fz;
+        const deltaFz = fz1 - fz0;
+        const xi = xl;
+
+        const slopeUniform = Math.pow(xi, 3) / 6 - Math.pow(xi, 2) / 4 + xi / 12;
+        const slopeLinear = Math.pow(xi, 4) / 24 - 3 * Math.pow(xi, 2) / 40 + xi / 30;
+
+        const EI = elem.getMaterial().e * elem.getCS().iy;
+
+        return ((l ** 3) / EI) * (fz0 * slopeUniform + deltaFz * slopeLinear);
+    }
+
     computeBeamNContrib(x: number): number {
         const intensities = this.getLocalIntensities();
         const geo = this.domain.getElement(this.target).computeGeo();

@@ -83,6 +83,10 @@ export class BeamTemperatureLoad extends BeamElementLoad {
     const u = 0.0;
     return { u: u, w: w };
   }
+  /** A temperature load bends the element through its end forces, not through a term of its own. */
+  computeBeamSlopeContrib(xl: number): number {
+    return 0.0;
+  }
   computeBeamNContrib(x: number): number {
     return 0.0;
   }

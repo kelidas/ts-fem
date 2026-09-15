@@ -9,6 +9,14 @@ export declare class BeamElementLoad extends Load {
         u: number;
         w: number;
     };
+    /**
+     * The slope this load adds to the deflection curve, dw/dx, at a normalized position.
+     *
+     * The rotation of a cross section is minus this. It is kept as a slope rather than as a rotation
+     * so that the sign convention is settled once, where the terms are summed, rather than in every
+     * load that contributes one.
+     */
+    computeBeamSlopeContrib(xl: number): number;
     computeBeamNContrib(x: number): number;
     computeBeamVContrib(x: number): number;
     computeBeamMContrib(x: number): number;

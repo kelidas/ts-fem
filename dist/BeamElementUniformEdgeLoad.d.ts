@@ -25,6 +25,11 @@ export declare class BeamElementUniformEdgeLoad extends BeamElementLoad {
         u: number;
         w: number;
     };
+    /**
+     * The derivative of the deflection above, term by term: the fourth power falls to a third, and
+     * the factor of the length falls with it because the polynomial is in x/l and this is in x.
+     */
+    computeBeamSlopeContrib(xl: number): number;
     computeBeamNContrib(x: number): number;
     computeBeamVContrib(x: number): number;
     computeBeamMContrib(x: number): number;

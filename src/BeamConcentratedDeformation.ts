@@ -213,6 +213,32 @@ export class BeamConcentratedDeformation extends BeamElementLoad {
     }
   }
 
+  /**
+   * The derivative of the deflection above, taken within whichever sub-beam the point falls in.
+   *
+   * Each sub-beam has its own normalized coordinate, so each brings its own length out of the
+   * derivative. A sub-beam of no length is the degenerate case the deflection already guards: there
+   * is no interval to differentiate over, and the slope belongs to the other one.
+   */
+  computeBeamSlopeContrib(xl: number): number {
+    const { a, b, l, rC1, rC2 } = this.getSegmentEndDisplacements();
+    const x = xl * l;
+
+    if (x <= a) {
+      if (a === 0) return 0;
+
+      const xi = x / a;
+
+      return ((6 * xi - 6 * xi * xi) / a) * rC1[1] + (2 * xi - 3 * xi * xi) * rC1[2];
+    }
+
+    if (b === 0) return 0;
+
+    const xi = (x - a) / b;
+
+    return ((-6 * xi + 6 * xi * xi) / b) * rC2[1] + (-1 + 4 * xi - 3 * xi * xi) * rC2[2];
+  }
+
   // An imposed deformation is a "dislocation": it produces a jump in displacement, not
   // in internal forces, so N, V and M stay continuous (no contribution to add here).
   computeBeamNContrib(_x: number): number {

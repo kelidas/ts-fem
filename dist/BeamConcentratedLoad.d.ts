@@ -27,6 +27,13 @@ export declare class BeamConcentratedLoad extends BeamElementLoad {
         u: number;
         w: number;
     };
+    /**
+     * The derivative of the deflection above. It is written in x already, so this is term by term -
+     * and the branch is the same one, which is what makes the slope one sided at the load: a force
+     * breaks the slope of the moment, and with it the curvature, but not the slope of the deflection,
+     * so the two sides agree here while the shear either side of it does not.
+     */
+    computeBeamSlopeContrib(xl: number): number;
     computeBeamNContrib(x: number): number;
     computeBeamVContrib(x: number): number;
     computeBeamMContrib(x: number): number;

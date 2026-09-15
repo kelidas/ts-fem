@@ -20,6 +20,7 @@ export * from "./Load";
 export * from "./NodalLoad";
 export * from "./BeamElementLoad";
 export * from "./BeamConcentratedLoad";
+export * from "./BeamConcentratedDeformation";
 export * from "./BeamElementUniformEdgeLoad";
 export * from "./BeamElementTrapezoidalEdgeLoad";
 export * from "./BeamTemperatureLoad";
