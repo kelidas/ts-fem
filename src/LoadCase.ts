@@ -69,13 +69,16 @@ export class LoadCase {
     return ans;
   }
 
+  /** `from` and `to` are distances from the element's first node; left out, the load covers it all. */
   createBeamElementTrapezoidalEdgeLoad(
     elem: LabelType,
     startValues: [number, number],
     endValues: [number, number],
-    lcs: boolean
+    lcs: boolean,
+    from?: number,
+    to?: number
   ) {
-    const ans = new BeamElementTrapezoidalEdgeLoad(elem, this.domain, startValues, endValues, lcs);
+    const ans = new BeamElementTrapezoidalEdgeLoad(elem, this.domain, startValues, endValues, lcs, from, to);
     this.elementLoadList.push(ans);
     return ans;
   }
