@@ -38,7 +38,8 @@ export declare class LoadCase {
     getElementLoadsOnElement(e: LabelType): Array<BeamElementLoad>;
     createNodalLoad(node: LabelType, values?: EnumDictionary<DofID, number>): NodalLoad;
     createBeamElementUniformEdgeLoad(elem: LabelType, values: number[], lcs: boolean): BeamElementUniformEdgeLoad;
-    createBeamElementTrapezoidalEdgeLoad(elem: LabelType, startValues: [number, number], endValues: [number, number], lcs: boolean): BeamElementTrapezoidalEdgeLoad;
+    /** `from` and `to` are distances from the element's first node; left out, the load covers it all. */
+    createBeamElementTrapezoidalEdgeLoad(elem: LabelType, startValues: [number, number], endValues: [number, number], lcs: boolean, from?: number, to?: number): BeamElementTrapezoidalEdgeLoad;
     createBeamConcentratedLoad(elem: LabelType, values: number[], lcs: boolean): BeamConcentratedLoad;
     createBeamConcentratedDeformation(elem: LabelType, values: number[], lcs: boolean): BeamConcentratedDeformation;
     createBeamTemperatureLoad(elem: LabelType, values: number[]): BeamTemperatureLoad;
