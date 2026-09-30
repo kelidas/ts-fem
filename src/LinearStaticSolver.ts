@@ -29,17 +29,23 @@ export class LinearStaticSolver extends Solver {
     for (let i = 0; i < this.loadCases.length; i++) {
       this.loadCases[i].r = math.zeros(this.neq + this.pneq) as math.Matrix;
       const lc = this.loadCases[i];
+      // A load switched off is skipped here rather than removed anywhere: the model keeps it,
+      // with its values, and only the vector this builds is as if it were not there.
       for (const load of lc.nodalLoadList) {
+        if (!load.active) continue;
         // assemble load
         this.assembleVecLC(this.f, load.getLoadVector(), load.getLocationArray(), i);
       }
 
       for (const load of lc.elementLoadList) {
+        if (!load.active) continue;
         this.assembleVecLC(this.f, load.getLoadVector(), load.getLocationArray(), i);
       }
 
-      // assemble prescribed displacement vector
+      // assemble prescribed displacement vector. Switched off, the degree of freedom stays
+      // prescribed - the support is still there - and what is prescribed is zero.
       for (const dbc of lc.prescribedBC) {
+        if (!dbc.active) continue;
         this.assembleVec(lc.r, dbc.getNodePrescribedDisplacementVector(), dbc.getLocationArray());
       }
     }

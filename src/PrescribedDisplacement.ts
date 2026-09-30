@@ -1,19 +1,23 @@
 import { Domain } from "./Domain";
+import { Load } from "./Load";
 import { EnumDictionary, DofID, LabelType } from ".";
 
-/** Class representing prescribed displacement TBD */
-export class PrescribedDisplacement {
-  target: string; // node (umber) subjected to Prescribed Displacement
+/**
+ * Class representing prescribed displacement TBD
+ *
+ * It is a load like the others - it is what a load case carries, it can be switched off and it can
+ * be named - and so it extends the same base, even though what it prescribes is a movement rather
+ * than a force.
+ */
+export class PrescribedDisplacement extends Load {
   prescribedValues: EnumDictionary<DofID, number>; // prescribed values of individual DOFs
-  domain: Domain;
 
   /**
    * Constructor
    */
   constructor(target: LabelType, domain: Domain, values: EnumDictionary<DofID, number>) {
-    this.target = target.toString();
+    super(target, domain);
     this.prescribedValues = values;
-    this.domain = domain;
   }
   getNodePrescribedDisplacementVector() {
     const answer = new Array<number>();

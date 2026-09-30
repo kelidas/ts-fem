@@ -47,7 +47,9 @@ export class LoadCase {
   getElementLoadsOnElement(e: LabelType): Array<BeamElementLoad> {
     const ans = [];
     for (const l of this.elementLoadList) {
-      if (l.target == e) {
+      // Every result along an element - N, V, M, the deflection, the rotation, the end forces -
+      // asks for its loads here, so a load switched off leaves all of them at once.
+      if (l.target == e && l.active) {
         ans.push(l);
       }
     }
