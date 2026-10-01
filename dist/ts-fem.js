@@ -376,11 +376,11 @@ function wi() {
       const Ie = Y[Ne], Ue = [];
       let Ke;
       for (Ke of ie) {
-        const Xe = b(Ke.params, Ne);
-        if (!(!Xe || Ie.restParam && !Xe.restParam)) {
-          if (!Xe.hasAny) {
-            const ir = D(Xe);
-            if (Ie.types.some((ar) => !ir.has(ar.name)))
+        const He = b(Ke.params, Ne);
+        if (!(!He || Ie.restParam && !He.restParam)) {
+          if (!He.hasAny) {
+            const ar = D(He);
+            if (Ie.types.some((ur) => !ar.has(ur.name)))
               continue;
           }
           Ue.push(Ke);
@@ -560,8 +560,8 @@ function wi() {
     for (te = 0; te < _.length; te++) {
       const Ie = [];
       if (ae.forEach((Ue) => {
-        const Ke = b(Ue.params, te), Xe = y(Ke);
-        (te < Ue.params.length || F(Ue.params)) && Xe(_[te]) && Ie.push(Ue);
+        const Ke = b(Ue.params, te), He = y(Ke);
+        (te < Ue.params.length || F(Ue.params)) && He(_[te]) && Ie.push(Ue);
       }), Ie.length === 0) {
         if (H = M(ae, te), H.length > 0) {
           const Ue = u(_[te]);
@@ -668,18 +668,18 @@ function wi() {
     const Ke = (L.length - R.length) * (ae ? -1 : 1);
     if (Ke !== 0)
       return Ke;
-    const Xe = [];
-    let ir = 0;
+    const He = [];
+    let ar = 0;
     for (let Nr = 0; Nr < L.length; ++Nr) {
       const nt = O(L[Nr], R[Nr]);
-      Xe.push(nt), ir += nt;
+      He.push(nt), ar += nt;
     }
-    if (ir !== 0)
-      return ir;
-    let ar;
-    for (ar of Xe)
-      if (ar !== 0)
-        return ar;
+    if (ar !== 0)
+      return ar;
+    let ur;
+    for (ur of He)
+      if (ur !== 0)
+        return ur;
     return 0;
   }
   function G(N) {
@@ -877,13 +877,13 @@ function wi() {
     const re = [], Ne = /* @__PURE__ */ new Map();
     for (ie of Y)
       Ne.has(ie.name) || (ie.fn = te[ie.fn], re.push(ie), Ne.set(ie.name, ie));
-    const Ie = re[0] && re[0].params.length <= 2 && !F(re[0].params), Ue = re[1] && re[1].params.length <= 2 && !F(re[1].params), Ke = re[2] && re[2].params.length <= 2 && !F(re[2].params), Xe = re[3] && re[3].params.length <= 2 && !F(re[3].params), ir = re[4] && re[4].params.length <= 2 && !F(re[4].params), ar = re[5] && re[5].params.length <= 2 && !F(re[5].params), Nr = Ie && Ue && Ke && Xe && ir && ar;
+    const Ie = re[0] && re[0].params.length <= 2 && !F(re[0].params), Ue = re[1] && re[1].params.length <= 2 && !F(re[1].params), Ke = re[2] && re[2].params.length <= 2 && !F(re[2].params), He = re[3] && re[3].params.length <= 2 && !F(re[3].params), ar = re[4] && re[4].params.length <= 2 && !F(re[4].params), ur = re[5] && re[5].params.length <= 2 && !F(re[5].params), Nr = Ie && Ue && Ke && He && ar && ur;
     for (let xe = 0; xe < re.length; ++xe)
       re[xe].test = C(re[xe].params);
-    const nt = Ie ? y(re[0].params[0]) : rr, Fa = Ue ? y(re[1].params[0]) : rr, Ca = Ke ? y(re[2].params[0]) : rr, ba = Xe ? y(re[3].params[0]) : rr, Ma = ir ? y(re[4].params[0]) : rr, Sa = ar ? y(re[5].params[0]) : rr, xa = Ie ? y(re[0].params[1]) : rr, Na = Ue ? y(re[1].params[1]) : rr, Ba = Ke ? y(re[2].params[1]) : rr, _a = Xe ? y(re[3].params[1]) : rr, za = ir ? y(re[4].params[1]) : rr, Ta = ar ? y(re[5].params[1]) : rr;
+    const nt = Ie ? y(re[0].params[0]) : rr, Fa = Ue ? y(re[1].params[0]) : rr, Ca = Ke ? y(re[2].params[0]) : rr, ba = He ? y(re[3].params[0]) : rr, Ma = ar ? y(re[4].params[0]) : rr, Sa = ur ? y(re[5].params[0]) : rr, xa = Ie ? y(re[0].params[1]) : rr, Na = Ue ? y(re[1].params[1]) : rr, Ba = Ke ? y(re[2].params[1]) : rr, _a = He ? y(re[3].params[1]) : rr, za = ar ? y(re[4].params[1]) : rr, Ta = ur ? y(re[5].params[1]) : rr;
     for (let xe = 0; xe < re.length; ++xe)
       re[xe].implementation = $(re[xe].params, re[xe].fn);
-    const Ia = Ie ? re[0].implementation : Br, Oa = Ue ? re[1].implementation : Br, La = Ke ? re[2].implementation : Br, $a = Xe ? re[3].implementation : Br, qa = ir ? re[4].implementation : Br, Pa = ar ? re[5].implementation : Br, Ra = Ie ? re[0].params.length : -1, Ua = Ue ? re[1].params.length : -1, Va = Ke ? re[2].params.length : -1, Za = Xe ? re[3].params.length : -1, Ga = ir ? re[4].params.length : -1, Ya = ar ? re[5].params.length : -1, Ja = Nr ? 6 : 0, Qa = re.length, Xa = re.map((xe) => xe.test), Ha = re.map((xe) => xe.implementation), Ka = function() {
+    const Ia = Ie ? re[0].implementation : Br, Oa = Ue ? re[1].implementation : Br, La = Ke ? re[2].implementation : Br, $a = He ? re[3].implementation : Br, qa = ar ? re[4].implementation : Br, Pa = ur ? re[5].implementation : Br, Ra = Ie ? re[0].params.length : -1, Ua = Ue ? re[1].params.length : -1, Va = Ke ? re[2].params.length : -1, Za = He ? re[3].params.length : -1, Ga = ar ? re[4].params.length : -1, Ya = ur ? re[5].params.length : -1, Ja = Nr ? 6 : 0, Qa = re.length, Xa = re.map((xe) => xe.test), Ha = re.map((xe) => xe.implementation), Ka = function() {
       for (let We = Ja; We < Qa; We++)
         if (Xa[We](arguments))
           return Ha[We].apply(this, arguments);
@@ -2059,7 +2059,7 @@ var _r = 9e15, Ar = 1e9, qt = "0123456789abcdef", lt = "2.3025850929940456840179
   // Whether to use cryptographically-secure random number generation, if available.
   crypto: !1
   // true/false
-}, Oi, dr, me = !0, Ft = "[DecimalError] ", wr = Ft + "Invalid argument: ", Li = Ft + "Precision limit exceeded", $i = Ft + "crypto unavailable", qi = "[object Decimal]", Qe = Math.floor, Ze = Math.pow, io = /^0b([01]+(\.[01]*)?|\.[01]+)(p[+-]?\d+)?$/i, ao = /^0x([0-9a-f]+(\.[0-9a-f]*)?|\.[0-9a-f]+)(p[+-]?\d+)?$/i, uo = /^0o([0-7]+(\.[0-7]*)?|\.[0-7]+)(p[+-]?\d+)?$/i, Pi = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, fr = 1e7, de = 7, oo = 9007199254740991, so = lt.length - 1, Rt = ht.length - 1, W = { toStringTag: qi };
+}, Oi, dr, me = !0, Ft = "[DecimalError] ", wr = Ft + "Invalid argument: ", Li = Ft + "Precision limit exceeded", $i = Ft + "crypto unavailable", qi = "[object Decimal]", Xe = Math.floor, Ze = Math.pow, io = /^0b([01]+(\.[01]*)?|\.[01]+)(p[+-]?\d+)?$/i, ao = /^0x([0-9a-f]+(\.[0-9a-f]*)?|\.[0-9a-f]+)(p[+-]?\d+)?$/i, uo = /^0o([0-7]+(\.[0-7]*)?|\.[0-7]+)(p[+-]?\d+)?$/i, Pi = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, fr = 1e7, de = 7, oo = 9007199254740991, so = lt.length - 1, Rt = ht.length - 1, W = { toStringTag: qi };
 W.absoluteValue = W.abs = function() {
   var e = new this.constructor(this);
   return e.s < 0 && (e.s = 1), ve(e);
@@ -2098,7 +2098,7 @@ W.cubeRoot = W.cbrt = function() {
   var e, n, t, i, r, a, o, l, c, h, s = this, u = s.constructor;
   if (!s.isFinite() || s.isZero())
     return new u(s);
-  for (me = !1, a = s.s * Ze(s.s * s, 1 / 3), !a || Math.abs(a) == 1 / 0 ? (t = Ye(s.d), e = s.e, (a = (e - t.length + 1) % 3) && (t += a == 1 || a == -2 ? "0" : "00"), a = Ze(t, 1 / 3), e = Qe((e + 1) / 3) - (e % 3 == (e < 0 ? -1 : 2)), a == 1 / 0 ? t = "5e" + e : (t = a.toExponential(), t = t.slice(0, t.indexOf("e") + 1) + e), i = new u(t), i.s = s.s) : i = new u(a.toString()), o = (e = u.precision) + 3; ; )
+  for (me = !1, a = s.s * Ze(s.s * s, 1 / 3), !a || Math.abs(a) == 1 / 0 ? (t = Ye(s.d), e = s.e, (a = (e - t.length + 1) % 3) && (t += a == 1 || a == -2 ? "0" : "00"), a = Ze(t, 1 / 3), e = Xe((e + 1) / 3) - (e % 3 == (e < 0 ? -1 : 2)), a == 1 / 0 ? t = "5e" + e : (t = a.toExponential(), t = t.slice(0, t.indexOf("e") + 1) + e), i = new u(t), i.s = s.s) : i = new u(a.toString()), o = (e = u.precision) + 3; ; )
     if (l = i, c = l.times(l).times(l), h = c.plus(s), i = Te(h.plus(s).times(l), h.plus(c), o + 2, 1), Ye(l.d).slice(0, o) === (t = Ye(i.d)).slice(0, o))
       if (t = t.slice(o - 3, o + 1), t == "9999" || !r && t == "4999") {
         if (!r && (ve(l, e + 1, 0), l.times(l).times(l).eq(s))) {
@@ -2115,7 +2115,7 @@ W.cubeRoot = W.cbrt = function() {
 W.decimalPlaces = W.dp = function() {
   var e, n = this.d, t = NaN;
   if (n) {
-    if (e = n.length - 1, t = (e - Qe(this.e / de)) * de, e = n[e], e)
+    if (e = n.length - 1, t = (e - Xe(this.e / de)) * de, e = n[e], e)
       for (; e % 10 == 0; e /= 10)
         t--;
     t < 0 && (t = 0);
@@ -2215,7 +2215,7 @@ W.isFinite = function() {
   return !!this.d;
 };
 W.isInteger = W.isInt = function() {
-  return !!this.d && Qe(this.e / de) > this.d.length - 2;
+  return !!this.d && Xe(this.e / de) > this.d.length - 2;
 };
 W.isNaN = function() {
   return !this.s;
@@ -2278,7 +2278,7 @@ W.minus = W.sub = function(e) {
       return new g(c === 3 ? -0 : 0);
     return me ? ve(e, l, c) : e;
   }
-  if (t = Qe(e.e / de), s = Qe(v.e / de), h = h.slice(), a = s - t, a) {
+  if (t = Xe(e.e / de), s = Xe(v.e / de), h = h.slice(), a = s - t, a) {
     for (u = a < 0, u ? (n = h, a = -a, o = f.length) : (n = f, t = s, o = h.length), i = Math.max(Math.ceil(l / de), o) + 2, a > i && (a = i, n.length = 1), n.reverse(), i = a; i--; )
       n.push(0);
     n.reverse();
@@ -2328,7 +2328,7 @@ W.plus = W.add = function(e) {
     return e.s = -e.s, u.minus(e);
   if (h = u.d, s = e.d, l = f.precision, c = f.rounding, !h[0] || !s[0])
     return s[0] || (e = new f(u)), me ? ve(e, l, c) : e;
-  if (a = Qe(u.e / de), i = Qe(e.e / de), h = h.slice(), r = a - i, r) {
+  if (a = Xe(u.e / de), i = Xe(e.e / de), h = h.slice(), r = a - i, r) {
     for (r < 0 ? (t = h, r = -r, o = s.length) : (t = s, i = a, o = h.length), a = Math.ceil(l / de), o = a > o ? a + 1 : o + 1, r > o && (r = o, t.length = 1), t.reverse(); r--; )
       t.push(0);
     t.reverse();
@@ -2357,7 +2357,7 @@ W.squareRoot = W.sqrt = function() {
   var e, n, t, i, r, a, o = this, l = o.d, c = o.e, h = o.s, s = o.constructor;
   if (h !== 1 || !l || !l[0])
     return new s(!h || h < 0 && (!l || l[0]) ? NaN : l ? o : 1 / 0);
-  for (me = !1, h = Math.sqrt(+o), h == 0 || h == 1 / 0 ? (n = Ye(l), (n.length + c) % 2 == 0 && (n += "0"), h = Math.sqrt(n), c = Qe((c + 1) / 2) - (c < 0 || c % 2), h == 1 / 0 ? n = "5e" + c : (n = h.toExponential(), n = n.slice(0, n.indexOf("e") + 1) + c), i = new s(n)) : i = new s(h.toString()), t = (c = s.precision) + 3; ; )
+  for (me = !1, h = Math.sqrt(+o), h == 0 || h == 1 / 0 ? (n = Ye(l), (n.length + c) % 2 == 0 && (n += "0"), h = Math.sqrt(n), c = Xe((c + 1) / 2) - (c < 0 || c % 2), h == 1 / 0 ? n = "5e" + c : (n = h.toExponential(), n = n.slice(0, n.indexOf("e") + 1) + c), i = new s(n)) : i = new s(h.toString()), t = (c = s.precision) + 3; ; )
     if (a = i, i = a.plus(Te(o, a, t + 2, 1)).times(0.5), Ye(a.d).slice(0, t) === (n = Ye(i.d)).slice(0, t))
       if (n = n.slice(t - 3, t + 1), n == "9999" || !r && n == "4999") {
         if (!r && (ve(a, c + 1, 0), a.times(a).eq(o))) {
@@ -2379,7 +2379,7 @@ W.times = W.mul = function(e) {
   var n, t, i, r, a, o, l, c, h, s = this, u = s.constructor, f = s.d, v = (e = new u(e)).d;
   if (e.s *= s.s, !f || !f[0] || !v || !v[0])
     return new u(!e.s || f && !f[0] && !v || v && !v[0] && !f ? NaN : !f || !v ? e.s / 0 : e.s * 0);
-  for (t = Qe(s.e / de) + Qe(e.e / de), c = f.length, h = v.length, c < h && (a = f, f = v, v = a, o = c, c = h, h = o), a = [], o = c + h, i = o; i--; )
+  for (t = Xe(s.e / de) + Xe(e.e / de), c = f.length, h = v.length, c < h && (a = f, f = v, v = a, o = c, c = h, h = o), a = [], o = c + h, i = o; i--; )
     a.push(0);
   for (i = h; --i >= 0; ) {
     for (n = 0, r = c + i; r > i; )
@@ -2451,7 +2451,7 @@ W.toPower = W.pow = function(e) {
     return l;
   if (i = c.precision, a = c.rounding, e.eq(1))
     return ve(l, i, a);
-  if (n = Qe(e.e / de), n >= e.d.length - 1 && (t = h < 0 ? -h : h) <= oo)
+  if (n = Xe(e.e / de), n >= e.d.length - 1 && (t = h < 0 ? -h : h) <= oo)
     return r = Ui(c, l, t, i), e.s < 0 ? new c(1).div(r) : ve(r, i, a);
   if (o = l.s, o < 0) {
     if (n < e.d.length - 1)
@@ -2459,7 +2459,7 @@ W.toPower = W.pow = function(e) {
     if (e.d[n] & 1 || (o = 1), l.e == 0 && l.d[0] == 1 && l.d.length == 1)
       return l.s = o, l;
   }
-  return t = Ze(+l, h), n = t == 0 || !isFinite(t) ? Qe(h * (Math.log("0." + Ye(l.d)) / Math.LN10 + l.e + 1)) : new c(t + "").e, n > c.maxE + 1 || n < c.minE - 1 ? new c(n > 0 ? o / 0 : 0) : (me = !1, c.rounding = l.s = 1, t = Math.min(12, (n + "").length), r = Ut(e.times(Dr(l, i + t)), i), r.d && (r = ve(r, i + 5, 1), Qr(r.d, i, a) && (n = i + 10, r = ve(Ut(e.times(Dr(l, n + t)), n), n + 5, 1), +Ye(r.d).slice(i + 1, i + 15) + 1 == 1e14 && (r = ve(r, i + 1, 0)))), r.s = o, me = !0, c.rounding = a, ve(r, i, a));
+  return t = Ze(+l, h), n = t == 0 || !isFinite(t) ? Xe(h * (Math.log("0." + Ye(l.d)) / Math.LN10 + l.e + 1)) : new c(t + "").e, n > c.maxE + 1 || n < c.minE - 1 ? new c(n > 0 ? o / 0 : 0) : (me = !1, c.rounding = l.s = 1, t = Math.min(12, (n + "").length), r = Ut(e.times(Dr(l, i + t)), i), r.d && (r = ve(r, i + 5, 1), Qr(r.d, i, a) && (n = i + 10, r = ve(Ut(e.times(Dr(l, n + t)), n), n + 5, 1), +Ye(r.d).slice(i + 1, i + 15) + 1 == 1e14 && (r = ve(r, i + 1, 0)))), r.s = o, me = !0, c.rounding = a, ve(r, i, a));
 };
 W.toPrecision = function(e, n) {
   var t, i = this, r = i.constructor;
@@ -2557,7 +2557,7 @@ var Te = /* @__PURE__ */ function() {
           O && O[0] == 0 || !B ? T * 0 : T / 0
         )
       );
-    for (c ? (v = 1, s = i.e - r.e) : (c = fr, v = de, s = Qe(i.e / v) - Qe(r.e / v)), M = B.length, E = O.length, p = new I(T), w = p.d = [], u = 0; B[u] == (O[u] || 0); u++)
+    for (c ? (v = 1, s = i.e - r.e) : (c = fr, v = de, s = Xe(i.e / v) - Xe(r.e / v)), M = B.length, E = O.length, p = new I(T), w = p.d = [], u = 0; B[u] == (O[u] || 0); u++)
       ;
     if (B[u] > (O[u] || 0) && s--, a == null ? (y = a = I.precision, o = I.rounding) : l ? y = a + (i.e - r.e) + 1 : y = a, y < 0)
       w.push(1), g = !0;
@@ -2671,7 +2671,7 @@ function mr(e) {
 function Ui(e, n, t, i) {
   var r, a = new e(1), o = Math.ceil(i / de + 4);
   for (me = !1; ; ) {
-    if (t % 2 && (a = a.times(n), dn(a.d, o) && (r = !0)), t = Qe(t / 2), t === 0) {
+    if (t % 2 && (a = a.times(n), dn(a.d, o) && (r = !0)), t = Xe(t / 2), t === 0) {
       t = a.d.length - 1, r && a.d[t] === 0 && ++a.d[t];
       break;
     }
@@ -2930,7 +2930,7 @@ function bo(e) {
   ];
   for (n = 0; n < a.length; n += 3)
     if (t = a[n], r && (this[t] = Pt[t]), (i = e[t]) !== void 0)
-      if (Qe(i) === i && i >= a[n + 1] && i <= a[n + 2])
+      if (Xe(i) === i && i >= a[n + 1] && i <= a[n + 2])
         this[t] = i;
       else
         throw Error(wr + t + ": " + i);
@@ -9875,7 +9875,7 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
 }), qe = /* @__PURE__ */ Ec({
   matrix: we,
   typed: ce
-}), He = /* @__PURE__ */ Mc({
+}), Qe = /* @__PURE__ */ Mc({
   BigNumber: Wr,
   config: je,
   matrix: we,
@@ -9946,14 +9946,14 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   subtractScalar: Sr,
   typed: ce,
   unaryMinus: jr,
-  zeros: He
+  zeros: Qe
 }), tt = /* @__PURE__ */ Gc({
   DenseMatrix: Je,
   concat: xr,
   config: je,
   matrix: we,
   typed: ce
-}), nr = /* @__PURE__ */ Rf({
+}), ir = /* @__PURE__ */ Rf({
   DenseMatrix: Je,
   concat: xr,
   equalScalar: cr,
@@ -9969,7 +9969,7 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   multiplyScalar: Fr,
   subtractScalar: Sr,
   typed: ce
-}), ur = /* @__PURE__ */ Al({
+}), nr = /* @__PURE__ */ Al({
   DenseMatrix: Je,
   SparseMatrix: Ur,
   addScalar: Er,
@@ -10005,19 +10005,19 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
 }), B0 = /* @__PURE__ */ r0({
   SparseMatrix: Ur,
   abs: kr,
-  add: ur,
+  add: nr,
   divideScalar: pr,
   larger: Vr,
   largerEq: Da,
   multiply: oe,
-  subtract: nr,
+  subtract: ir,
   transpose: qe,
   typed: ce
 }), ye = /* @__PURE__ */ gc({
-  add: ur,
+  add: nr,
   matrix: we,
   typed: ce,
-  zeros: He
+  zeros: Qe
 }), _0 = /* @__PURE__ */ Pc({
   DenseMatrix: Je,
   divideScalar: pr,
@@ -10049,7 +10049,7 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
 }), Tr = /* @__PURE__ */ fc({
   bignumber: jt,
   matrix: we,
-  add: ur,
+  add: nr,
   config: je,
   isPositive: g0,
   larger: Vr,
@@ -10110,7 +10110,7 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   usolve: ya
 }), R0 = /* @__PURE__ */ h0({
   abs: kr,
-  add: ur,
+  add: nr,
   addScalar: Er,
   atan: v0,
   bignumber: jt,
@@ -10138,13 +10138,13 @@ var c0 = "eigs", l0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   size: et,
   smaller: tt,
   sqrt: tn,
-  subtract: nr,
+  subtract: ir,
   typed: ce,
   usolve: ya,
   usolveAll: _0
 }), vi = /* @__PURE__ */ Fl({
   abs: kr,
-  add: ur,
+  add: nr,
   conj: Nt,
   ctranspose: C0,
   eigs: R0,
@@ -10216,7 +10216,7 @@ class U0 {
     if (this.lcs == null)
       return rt(t);
     {
-      const i = He([t, t]);
+      const i = Qe([t, t]);
       for (let r = 0; r < t; r++) {
         const a = n[r];
         switch (a) {
@@ -10279,7 +10279,7 @@ class U0 {
         values: oe(o, a).toArray()
       };
     } else if (this.bcs.size > 0) {
-      const i = Array.from(this.bcs), r = this.getLocationArray(i), a = nr(r, this.domain.solver.neq), o = ye(n.R, ge(a));
+      const i = Array.from(this.bcs), r = this.getLocationArray(i), a = ir(r, this.domain.solver.neq), o = ye(n.R, ge(a));
       return A0(o) === "number" ? { dofs: i, values: [o] } : { dofs: i, values: o };
     } else
       return { dofs: [], values: [] };
@@ -10415,7 +10415,7 @@ class Z0 extends V0 {
       [0, 0, 0, 0, 0, 1]
     ]);
     if (this.domain.getNode(this.nodes[0]).hasLcs() || this.domain.getNode(this.nodes[1]).hasLcs()) {
-      let o = He(6);
+      let o = Qe(6);
       o = ye(
         o,
         ge([0, 1, 2], [0, 1, 2]),
@@ -10448,8 +10448,8 @@ class Z0 extends V0 {
         var g = [0, 1, 3, 4, 5], d = [2];
       else if (this.hinges[1])
         var g = [0, 1, 2, 3, 4], d = [5];
-      const m = v.subset(ge(g, g)), p = v.subset(ge(g, d)), w = v.subset(ge(d, d)), D = nr(m, oe(oe(p, or(w)), qe(p)));
-      let A = He(6, 6);
+      const m = v.subset(ge(g, g)), p = v.subset(ge(g, d)), w = v.subset(ge(d, d)), D = ir(m, oe(oe(p, or(w)), qe(p)));
+      let A = Qe(6, 6);
       return A = ye(A, ge(g, g), D), t ? {
         answer: A,
         a: g,
@@ -10491,13 +10491,13 @@ class Z0 extends V0 {
     oe(u, c / (1 + h) / (1 + h));
     const f = Math.min(Math.abs(u[1][1]), Math.abs(u[2][2])) / 1e3;
     if (u[0][0] = f, u[0][3] = -f, u[3][0] = -f, u[3][3] = f, this.hasHinges()) {
-      const v = this.computeLocalStiffnessMtrx(!0), g = et(v.a)[0], d = He(6, g);
+      const v = this.computeLocalStiffnessMtrx(!0), g = et(v.a)[0], d = Qe(6, g);
       ye(d, ge(v.a, Tr(0, g)), rt(g)), ye(
         d,
         ge(v.b, Tr(0, g)),
         oe(oe(or(v.kbb), qe(v.kab)), -1)
       );
-      const m = oe(qe(d), oe(u, d)), p = He(6, 6);
+      const m = oe(qe(d), oe(u, d)), p = Qe(6, 6);
       return ye(v.a, ge(v.a, v.a), m), p;
     }
     return u;
@@ -10566,16 +10566,16 @@ class Z0 extends V0 {
     let a = oe(i, ye(t.r, ge(r)));
     if (this.hasHinges()) {
       const o = this.computeLocalStiffnessMtrx(!0);
-      let l = He(6);
+      let l = Qe(6);
       for (const c of t.getElementLoadsOnElement(this.label))
-        l = ur(l, c.getLoadVectorForClampedBeam());
+        l = nr(l, c.getLoadVectorForClampedBeam());
       this.hasHinges() && (a = ye(
         a,
         ge(o.b),
         oe(
           or(o.kbb),
           oe(
-            ur(
+            nr(
               ye(l, ge(o.b)),
               Cr(oe(qe(o.kab), ye(a, ge(o.a))))
             ),
@@ -10592,9 +10592,9 @@ class Z0 extends V0 {
    */
   computeEndForces(t) {
     const i = this.computeT(), r = this.getLocationArray(), a = oe(i, ye(t.r, ge(r))), o = this.computeLocalStiffnessMtrx(!0);
-    let l = oe(o.answer, a), c = He(6);
+    let l = oe(o.answer, a), c = Qe(6);
     for (const h of t.getElementLoadsOnElement(this.label))
-      c = ur(c, h.getLoadVectorForClampedBeam());
+      c = nr(c, h.getLoadVectorForClampedBeam());
     if (this.hasHinges()) {
       const h = oe(o.kab, or(o.kbb));
       if (o.b.length == 1) {
@@ -10602,14 +10602,14 @@ class Z0 extends V0 {
         for (let u = 0; u < o.a.length; u++)
           l.set([o.a[u]], l.get([o.a[u]]) + c.get([o.a[u]]) - h.get([u, 0]) * s);
       } else {
-        const s = nr(
+        const s = ir(
           ye(c, ge(o.a)),
           oe(h, ye(c, ge(o.b)))
         );
-        l = ur(l, ye(l, ge(o.a), s));
+        l = nr(l, ye(l, ge(o.a), s));
       }
     } else
-      l = ur(l, c);
+      l = nr(l, c);
     return l;
   }
   /**
@@ -10649,14 +10649,14 @@ class Z0 extends V0 {
     const r = this.computeT(), a = this.getLocationArray();
     let o = oe(r, ye(t.eigenVectors[i], ge(a)));
     if (this.hasHinges()) {
-      const l = this.computeLocalStiffnessMtrx(!0), c = He(6);
+      const l = this.computeLocalStiffnessMtrx(!0), c = Qe(6);
       this.hasHinges() && (o = ye(
         o,
         ge(l.b),
         oe(
           or(l.kbb),
           oe(
-            ur(
+            nr(
               ye(c, ge(l.b)),
               Cr(oe(qe(l.kab), ye(o, ge(l.a))))
             ),
@@ -10875,7 +10875,7 @@ class Y0 extends Bt {
           s[o[v]] = r[o[v]] - u.get([v, 0]) * f;
         return oe(oe(qe(i), s), -1).toArray();
       } else {
-        const f = nr(ye(r, ge(o)), oe(u, ye(r, ge(l))));
+        const f = ir(ye(r, ge(o)), oe(u, ye(r, ge(l))));
         return s = ye(s, ge(o), f), oe(oe(qe(i), s), -1).toArray();
       }
     } else
@@ -10946,7 +10946,7 @@ class J0 extends Bt {
           o[a.a[h]] = r[a.a[h]] - l.get([h, 0]) * c;
         return oe(oe(qe(i), o), -1).toArray();
       } else {
-        const c = nr(
+        const c = ir(
           ye(r, ge(a.a)),
           oe(l, ye(r, ge(a.b)))
         );
@@ -11025,7 +11025,7 @@ class Q0 extends Bt {
           o[a.a[h]] = r[a.a[h]] - l.get([h, 0]) * c;
         return oe(oe(qe(i), o), -1).toArray();
       } else {
-        const c = nr(
+        const c = ir(
           ye(r, ge(a.a)),
           oe(l, ye(r, ge(a.b)))
         );
@@ -11049,12 +11049,6 @@ class Q0 extends Bt {
   computeBeamMContrib(t) {
     const i = this.getLocalIntensities(), a = this.domain.getElement(this.target).computeGeo().l, o = i.start.fz, c = i.end.fz - o;
     return -(0.5 * o * t * t + c / (6 * a) * t * t * t);
-  }
-  getDistributedLoadPolynomials() {
-    const i = this.domain.getElement(this.target).computeGeo().l, r = this.getLocalIntensities(), a = [], o = [r.start.fx, (r.end.fx - r.start.fx) / i];
-    o.some((c) => Math.abs(c) > 0) && a.push({ direction: "axial", coefficients: o, range: [0, i] });
-    const l = [r.start.fz, (r.end.fz - r.start.fz) / i];
-    return l.some((c) => Math.abs(c) > 0) && a.push({ direction: "transverse", coefficients: l, range: [0, i] }), a;
   }
 }
 class X0 extends Bt {
@@ -11094,7 +11088,7 @@ class X0 extends Bt {
           o[a.a[h]] = r[a.a[h]] - l.get([h, 0]) * c;
         return oe(oe(qe(i), o), -1).toArray();
       } else {
-        const c = nr(
+        const c = ir(
           ye(r, ge(a.a)),
           oe(l, ye(r, ge(a.b)))
         );
@@ -11281,6 +11275,9 @@ class rh {
     fe(this, "k");
     fe(this, "m");
     fe(this, "f");
+    /** `f`'s two parts: what a direct nodal load contributes, and what an element load's own work-equivalent nodal forces contribute. Their sum is `f`. */
+    fe(this, "fNodal");
+    fe(this, "fElement");
     fe(this, "loadCases", new Array());
     fe(this, "codeNumberGenerated", !1);
     // code numbers assigned to supported as well as free DOFs
@@ -11333,7 +11330,7 @@ class rh {
 }
 class ih extends rh {
   assemble() {
-    this.k = He(this.neq + this.pneq, this.neq + this.pneq);
+    this.k = Qe(this.neq + this.pneq, this.neq + this.pneq);
     for (const [n, t] of this.domain.elements) {
       const i = t.computeStiffness(), r = t.getLocationArray(), a = et(r)[0];
       for (let o = 0; o < a; o++) {
@@ -11344,17 +11341,18 @@ class ih extends rh {
         }
       }
     }
-    this.f = He(this.neq + this.pneq, this.loadCases.length);
+    this.fNodal = Qe(this.neq + this.pneq, this.loadCases.length), this.fElement = Qe(this.neq + this.pneq, this.loadCases.length);
     for (let n = 0; n < this.loadCases.length; n++) {
-      this.loadCases[n].r = He(this.neq + this.pneq);
+      this.loadCases[n].r = Qe(this.neq + this.pneq);
       const t = this.loadCases[n];
       for (const i of t.nodalLoadList)
-        this.assembleVecLC(this.f, i.getLoadVector(), i.getLocationArray(), n);
+        this.assembleVecLC(this.fNodal, i.getLoadVector(), i.getLocationArray(), n);
       for (const i of t.elementLoadList)
-        this.assembleVecLC(this.f, i.getLoadVector(), i.getLocationArray(), n);
+        this.assembleVecLC(this.fElement, i.getLoadVector(), i.getLocationArray(), n);
       for (const i of t.prescribedBC)
         this.assembleVec(t.r, i.getNodePrescribedDisplacementVector(), i.getLocationArray());
     }
+    this.f = nr(this.fNodal, this.fElement);
   }
   solve() {
     const n = /* @__PURE__ */ new Date();
@@ -11368,15 +11366,15 @@ class ih extends rh {
         typeof h == "number" && (h = we([[h]]));
         let s = ye(this.f, ge(t, [o]));
         typeof s == "number" && (s = we([s]));
-        const u = nr(Cr(s), c), f = Cr(P0(h, u));
-        this.loadCases[o].r = ye(this.loadCases[o].r, ge(Tr(0, this.neq)), f), this.loadCases[o].R = ye(oe(this.k, this.loadCases[o].r), ge(i)), this.loadCases[o].R = nr(
+        const u = ir(Cr(s), c), f = Cr(P0(h, u));
+        this.loadCases[o].r = ye(this.loadCases[o].r, ge(Tr(0, this.neq)), f), this.loadCases[o].R = ye(oe(this.k, this.loadCases[o].r), ge(i)), this.loadCases[o].R = ir(
           this.loadCases[o].R,
           Cr(ye(this.f, ge(i, [o])))
         ), this.loadCases[o].solved = !0;
       }
     else
       for (let o = 0; o < this.loadCases.length; o++)
-        this.loadCases[o].R = Cr(oe(this.k, this.loadCases[o].r)), this.loadCases[o].R = nr(
+        this.loadCases[o].R = Cr(oe(this.k, this.loadCases[o].r)), this.loadCases[o].R = ir(
           this.loadCases[o].R,
           Cr(ye(this.f, ge(i, [o])))
         ), this.loadCases[o].solved = !0;
@@ -11400,9 +11398,9 @@ class th {
     fe(this, "elementLoadList", new Array());
     fe(this, "prescribedBC", new Array());
     // solution vector
-    fe(this, "r", He(0));
+    fe(this, "r", Qe(0));
     // vector of reactions
-    fe(this, "R", He(0));
+    fe(this, "R", Qe(0));
     // omegas
     fe(this, "eigenNumbers", []);
     fe(this, "eigenVectors", []);

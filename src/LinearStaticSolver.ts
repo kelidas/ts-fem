@@ -25,17 +25,18 @@ export class LinearStaticSolver extends Solver {
     }
     //console.log("k=", this.k);
 
-    this.f = math.zeros(this.neq + this.pneq, this.loadCases.length) as math.Matrix;
+    this.fNodal = math.zeros(this.neq + this.pneq, this.loadCases.length) as math.Matrix;
+    this.fElement = math.zeros(this.neq + this.pneq, this.loadCases.length) as math.Matrix;
     for (let i = 0; i < this.loadCases.length; i++) {
       this.loadCases[i].r = math.zeros(this.neq + this.pneq) as math.Matrix;
       const lc = this.loadCases[i];
       for (const load of lc.nodalLoadList) {
         // assemble load
-        this.assembleVecLC(this.f, load.getLoadVector(), load.getLocationArray(), i);
+        this.assembleVecLC(this.fNodal as math.Matrix, load.getLoadVector(), load.getLocationArray(), i);
       }
 
       for (const load of lc.elementLoadList) {
-        this.assembleVecLC(this.f, load.getLoadVector(), load.getLocationArray(), i);
+        this.assembleVecLC(this.fElement as math.Matrix, load.getLoadVector(), load.getLocationArray(), i);
       }
 
       // assemble prescribed displacement vector
@@ -43,6 +44,7 @@ export class LinearStaticSolver extends Solver {
         this.assembleVec(lc.r, dbc.getNodePrescribedDisplacementVector(), dbc.getLocationArray());
       }
     }
+    this.f = math.add(this.fNodal as math.Matrix, this.fElement as math.Matrix) as math.Matrix;
   }
 
   solve() {
