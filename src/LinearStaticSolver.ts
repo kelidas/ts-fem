@@ -45,6 +45,37 @@ export class LinearStaticSolver extends Solver {
     }
   }
 
+  /**
+   * What the free block is actually solved against, for one load case.
+   *
+   * `Kr = f` holds for every equation, but only the free ones are solved for - the prescribed
+   * ones already have their answer. Moved to the other side, their contribution becomes a
+   * correction to the load: `b = f[free] - K[free, prescribed] · r[prescribed]`. A zero
+   * prescribed displacement, the ordinary case, leaves nothing to correct, and b is f[free]
+   * alone.
+   *
+   * Public so a reader of the assembled system - a widget showing it, say - can ask for exactly
+   * what `solve()` asks `lusolve` to solve, rather than a second copy of this arithmetic agreeing
+   * with the first by coincidence.
+   */
+  rightHandSide(lc: number): math.Matrix {
+    if (this.neq === 0) return math.zeros(0) as math.Matrix;
+
+    const unknowns = math.range(0, this.neq);
+    const prescribed = math.range(this.neq, this.neq + this.pneq);
+
+    const rp = math.subset(this.loadCases[lc].r, math.index(prescribed));
+    const fp = math.multiply(math.subset(this.k, math.index(unknowns, prescribed)), rp) as math.Matrix;
+
+    let bsolve = math.subset(this.f, math.index(unknowns, [lc]));
+
+    if (typeof bsolve === "number") {
+      bsolve = math.matrix([bsolve]);
+    }
+
+    return math.subtract(math.squeeze(bsolve), fp) as math.Matrix;
+  }
+
   solve() {
     const startime = new Date();
     if (!this.codeNumberGenerated) {
@@ -59,8 +90,7 @@ export class LinearStaticSolver extends Solver {
       for (let lc = 0; lc < this.loadCases.length; lc++) {
         this.loadCases[lc].solved = false;
 
-        const rp = math.subset(this.loadCases[lc].r, math.index(prescribed));
-        const fp = math.multiply(math.subset(this.k, math.index(unknowns, prescribed)), rp) as math.Matrix;
+        const b = this.rightHandSide(lc);
 
         let ksolve = math.subset(this.k, math.index(unknowns, unknowns));
 
@@ -68,13 +98,6 @@ export class LinearStaticSolver extends Solver {
           ksolve = math.matrix([[ksolve]]);
         }
 
-        let bsolve = math.subset(this.f, math.index(unknowns, [lc]));
-
-        if (typeof bsolve === "number") {
-          bsolve = math.matrix([bsolve]);
-        }
-
-        const b = math.subtract(math.squeeze(bsolve), fp) as math.Matrix;
         const ru = math.squeeze(math.lusolve(ksolve, b));
 
         this.loadCases[lc].r = math.subset(this.loadCases[lc].r, math.index(math.range(0, this.neq)), ru);
