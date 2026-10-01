@@ -6,6 +6,15 @@ import { Solver } from ".";
 export declare class LinearStaticSolver extends Solver {
     assemble(): void;
     /**
+     * What a prescribed equation's solved displacement couples back into the free block:
+     * `K[free,prescribed] · r[prescribed]`. Zero wherever nothing is prescribed, or every
+     * prescribed value is zero - the ordinary case of a plain support rather than a settlement.
+     *
+     * `rightHandSide()` subtracts exactly this from `f[free]` to get `b`; public so a reader can
+     * see the correction on its own rather than only its effect on `b`.
+     */
+    prescribedCoupling(lc: number): math.Matrix;
+    /**
      * What the free block is actually solved against, for one load case.
      *
      * `Kr = f` holds for every equation, but only the free ones are solved for - the prescribed

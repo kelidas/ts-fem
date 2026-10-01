@@ -54,6 +54,25 @@ export class LinearStaticSolver extends Solver {
   }
 
   /**
+   * What a prescribed equation's solved displacement couples back into the free block:
+   * `K[free,prescribed] · r[prescribed]`. Zero wherever nothing is prescribed, or every
+   * prescribed value is zero - the ordinary case of a plain support rather than a settlement.
+   *
+   * `rightHandSide()` subtracts exactly this from `f[free]` to get `b`; public so a reader can
+   * see the correction on its own rather than only its effect on `b`.
+   */
+  prescribedCoupling(lc: number): math.Matrix {
+    if (this.neq === 0) return math.zeros(0) as math.Matrix;
+
+    const unknowns = math.range(0, this.neq);
+    const prescribed = math.range(this.neq, this.neq + this.pneq);
+
+    const rp = math.subset(this.loadCases[lc].r, math.index(prescribed));
+
+    return math.multiply(math.subset(this.k, math.index(unknowns, prescribed)), rp) as math.Matrix;
+  }
+
+  /**
    * What the free block is actually solved against, for one load case.
    *
    * `Kr = f` holds for every equation, but only the free ones are solved for - the prescribed
@@ -70,10 +89,6 @@ export class LinearStaticSolver extends Solver {
     if (this.neq === 0) return math.zeros(0) as math.Matrix;
 
     const unknowns = math.range(0, this.neq);
-    const prescribed = math.range(this.neq, this.neq + this.pneq);
-
-    const rp = math.subset(this.loadCases[lc].r, math.index(prescribed));
-    const fp = math.multiply(math.subset(this.k, math.index(unknowns, prescribed)), rp) as math.Matrix;
 
     let bsolve = math.subset(this.f, math.index(unknowns, [lc]));
 
@@ -81,7 +96,7 @@ export class LinearStaticSolver extends Solver {
       bsolve = math.matrix([bsolve]);
     }
 
-    return math.subtract(math.squeeze(bsolve), fp) as math.Matrix;
+    return math.subtract(math.squeeze(bsolve), this.prescribedCoupling(lc)) as math.Matrix;
   }
 
   solve() {

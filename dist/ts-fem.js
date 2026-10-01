@@ -2059,7 +2059,7 @@ var Ir = 9e15, Cr = 1e9, Gt = "0123456789abcdef", dt = "2.3025850929940456840179
   // Whether to use cryptographically-secure random number generation, if available.
   crypto: !1
   // true/false
-}, Yi, pr, ge = !0, Nt = "[DecimalError] ", Er = Nt + "Invalid argument: ", Ji = Nt + "Precision limit exceeded", Qi = Nt + "crypto unavailable", Xi = "[object Decimal]", Xe = Math.floor, Ge = Math.pow, mo = /^0b([01]+(\.[01]*)?|\.[01]+)(p[+-]?\d+)?$/i, go = /^0x([0-9a-f]+(\.[0-9a-f]*)?|\.[0-9a-f]+)(p[+-]?\d+)?$/i, Do = /^0o([0-7]+(\.[0-7]*)?|\.[0-7]+)(p[+-]?\d+)?$/i, Hi = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, fr = 1e7, de = 7, wo = 9007199254740991, yo = dt.length - 1, Yt = mt.length - 1, W = { toStringTag: Xi };
+}, Yi, dr, ge = !0, Nt = "[DecimalError] ", Er = Nt + "Invalid argument: ", Ji = Nt + "Precision limit exceeded", Qi = Nt + "crypto unavailable", Xi = "[object Decimal]", Xe = Math.floor, Ge = Math.pow, mo = /^0b([01]+(\.[01]*)?|\.[01]+)(p[+-]?\d+)?$/i, go = /^0x([0-9a-f]+(\.[0-9a-f]*)?|\.[0-9a-f]+)(p[+-]?\d+)?$/i, Do = /^0o([0-7]+(\.[0-7]*)?|\.[0-7]+)(p[+-]?\d+)?$/i, Hi = /^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i, fr = 1e7, de = 7, wo = 9007199254740991, yo = dt.length - 1, Yt = mt.length - 1, W = { toStringTag: Xi };
 W.absoluteValue = W.abs = function() {
   var e = new this.constructor(this);
   return e.s < 0 && (e.s = 1), pe(e);
@@ -2092,7 +2092,7 @@ W.comparedTo = W.cmp = function(e) {
 };
 W.cosine = W.cos = function() {
   var e, i, t = this, n = t.constructor;
-  return t.d ? t.d[0] ? (e = n.precision, i = n.rounding, n.precision = e + Math.max(t.e, t.sd()) + de, n.rounding = 1, t = Ao(n, ea(n, t)), n.precision = e, n.rounding = i, pe(pr == 2 || pr == 3 ? t.neg() : t, e, i, !0)) : new n(1) : new n(NaN);
+  return t.d ? t.d[0] ? (e = n.precision, i = n.rounding, n.precision = e + Math.max(t.e, t.sd()) + de, n.rounding = 1, t = Ao(n, ea(n, t)), n.precision = e, n.rounding = i, pe(dr == 2 || dr == 3 ? t.neg() : t, e, i, !0)) : new n(1) : new n(NaN);
 };
 W.cubeRoot = W.cbrt = function() {
   var e, i, t, n, r, a, u, c, f, h, s = this, o = s.constructor;
@@ -2351,7 +2351,7 @@ W.round = function() {
 };
 W.sine = W.sin = function() {
   var e, i, t = this, n = t.constructor;
-  return t.isFinite() ? t.isZero() ? new n(t) : (e = n.precision, i = n.rounding, n.precision = e + Math.max(t.e, t.sd()) + de, n.rounding = 1, t = Co(n, ea(n, t)), n.precision = e, n.rounding = i, pe(pr > 2 ? t.neg() : t, e, i, !0)) : new n(NaN);
+  return t.isFinite() ? t.isZero() ? new n(t) : (e = n.precision, i = n.rounding, n.precision = e + Math.max(t.e, t.sd()) + de, n.rounding = 1, t = Co(n, ea(n, t)), n.precision = e, n.rounding = i, pe(dr > 2 ? t.neg() : t, e, i, !0)) : new n(NaN);
 };
 W.squareRoot = W.sqrt = function() {
   var e, i, t, n, r, a, u = this, c = u.d, f = u.e, h = u.s, s = u.constructor;
@@ -2373,7 +2373,7 @@ W.squareRoot = W.sqrt = function() {
 };
 W.tangent = W.tan = function() {
   var e, i, t = this, n = t.constructor;
-  return t.isFinite() ? t.isZero() ? new n(t) : (e = n.precision, i = n.rounding, n.precision = e + 10, n.rounding = 1, t = t.sin(), t.s = 1, t = Te(t, new n(1).minus(t.times(t)).sqrt(), e + 10, 0), n.precision = e, n.rounding = i, pe(pr == 2 || pr == 4 ? t.neg() : t, e, i, !0)) : new n(NaN);
+  return t.isFinite() ? t.isZero() ? new n(t) : (e = n.precision, i = n.rounding, n.precision = e + 10, n.rounding = 1, t = t.sin(), t.s = 1, t = Te(t, new n(1).minus(t.times(t)).sqrt(), e + 10, 0), n.precision = e, n.rounding = i, pe(dr == 2 || dr == 4 ? t.neg() : t, e, i, !0)) : new n(NaN);
 };
 W.times = W.mul = function(e) {
   var i, t, n, r, a, u, c, f, h, s = this, o = s.constructor, l = s.d, v = (e = new o(e)).d;
@@ -2484,8 +2484,8 @@ function Je(e) {
   var i, t, n, r = e.length - 1, a = "", u = e[0];
   if (r > 0) {
     for (a += u, i = 1; i < r; i++)
-      n = e[i] + "", t = de - n.length, t && (a += gr(t)), a += n;
-    u = e[i], n = u + "", t = de - n.length, t && (a += gr(t));
+      n = e[i] + "", t = de - n.length, t && (a += Dr(t)), a += n;
+    u = e[i], n = u + "", t = de - n.length, t && (a += Dr(t));
   } else if (u === 0)
     return "0";
   for (; u % 10 === 0; )
@@ -2635,7 +2635,7 @@ function hr(e, i, t) {
   if (!e.isFinite())
     return ji(e);
   var n, r = e.e, a = Je(e.d), u = a.length;
-  return i ? (t && (n = t - u) > 0 ? a = a.charAt(0) + "." + a.slice(1) + gr(n) : u > 1 && (a = a.charAt(0) + "." + a.slice(1)), a = a + (e.e < 0 ? "e" : "e+") + e.e) : r < 0 ? (a = "0." + gr(-r - 1) + a, t && (n = t - u) > 0 && (a += gr(n))) : r >= u ? (a += gr(r + 1 - u), t && (n = t - r - 1) > 0 && (a = a + "." + gr(n))) : ((n = r + 1) < u && (a = a.slice(0, n) + "." + a.slice(n)), t && (n = t - u) > 0 && (r + 1 === u && (a += "."), a += gr(n))), a;
+  return i ? (t && (n = t - u) > 0 ? a = a.charAt(0) + "." + a.slice(1) + Dr(n) : u > 1 && (a = a.charAt(0) + "." + a.slice(1)), a = a + (e.e < 0 ? "e" : "e+") + e.e) : r < 0 ? (a = "0." + Dr(-r - 1) + a, t && (n = t - u) > 0 && (a += Dr(n))) : r >= u ? (a += Dr(r + 1 - u), t && (n = t - r - 1) > 0 && (a = a + "." + Dr(n))) : ((n = r + 1) < u && (a = a.slice(0, n) + "." + a.slice(n)), t && (n = t - u) > 0 && (r + 1 === u && (a += "."), a += Dr(n))), a;
 }
 function Bt(e, i) {
   var t = e[0];
@@ -2663,7 +2663,7 @@ function Ki(e) {
   }
   return t;
 }
-function gr(e) {
+function Dr(e) {
   for (var i = ""; e--; )
     i += "0";
   return i;
@@ -2807,13 +2807,13 @@ function xt(e, i) {
 function ea(e, i) {
   var t, n = i.s < 0, r = sr(e, e.precision, 1), a = r.times(0.5);
   if (i = i.abs(), i.lte(a))
-    return pr = n ? 4 : 1, i;
+    return dr = n ? 4 : 1, i;
   if (t = i.divToInt(r), t.isZero())
-    pr = n ? 3 : 2;
+    dr = n ? 3 : 2;
   else {
     if (i = i.minus(t.times(r)), i.lte(a))
-      return pr = An(t) ? n ? 2 : 3 : n ? 4 : 1, i;
-    pr = An(t) ? n ? 1 : 4 : n ? 3 : 2;
+      return dr = An(t) ? n ? 2 : 3 : n ? 4 : 1, i;
+    dr = An(t) ? n ? 1 : 4 : n ? 3 : 2;
   }
   return i.minus(r).abs();
 }
@@ -3874,40 +3874,40 @@ var na = { exports: {} };
   })();
 })(na);
 var hs = na.exports;
-const Ze = /* @__PURE__ */ ta(hs);
-var vs = "Complex", ps = [], ds = /* @__PURE__ */ ee(vs, ps, () => (Object.defineProperty(Ze, "name", {
+const Ye = /* @__PURE__ */ ta(hs);
+var vs = "Complex", ps = [], ds = /* @__PURE__ */ ee(vs, ps, () => (Object.defineProperty(Ye, "name", {
   value: "Complex"
-}), Ze.prototype.constructor = Ze, Ze.prototype.type = "Complex", Ze.prototype.isComplex = !0, Ze.prototype.toJSON = function() {
+}), Ye.prototype.constructor = Ye, Ye.prototype.type = "Complex", Ye.prototype.isComplex = !0, Ye.prototype.toJSON = function() {
   return {
     mathjs: "Complex",
     re: this.re,
     im: this.im
   };
-}, Ze.prototype.toPolar = function() {
+}, Ye.prototype.toPolar = function() {
   return {
     r: this.abs(),
     phi: this.arg()
   };
-}, Ze.prototype.format = function(e) {
+}, Ye.prototype.format = function(e) {
   var i = "", t = this.im, n = this.re, r = Rt(this.re, e), a = Rt(this.im, e), u = qe(e) ? e : e ? e.precision : null;
   if (u !== null) {
     var c = Math.pow(10, -u);
     Math.abs(n / t) < c && (n = 0), Math.abs(t / n) < c && (t = 0);
   }
   return t === 0 ? i = r : n === 0 ? t === 1 ? i = "i" : t === -1 ? i = "-i" : i = a + "i" : t < 0 ? t === -1 ? i = r + " - i" : i = r + " - " + a.substring(1) + "i" : t === 1 ? i = r + " + i" : i = r + " + " + a + "i", i;
-}, Ze.fromPolar = function(e) {
+}, Ye.fromPolar = function(e) {
   switch (arguments.length) {
     case 1: {
       var i = arguments[0];
       if (typeof i == "object")
-        return Ze(i);
+        return Ye(i);
       throw new TypeError("Input has to be an object with r and phi keys.");
     }
     case 2: {
       var t = arguments[0], n = arguments[1];
       if (qe(t)) {
         if (bi(n) && n.hasBase("ANGLE") && (n = n.toNumber("rad")), qe(n))
-          return new Ze({
+          return new Ye({
             r: t,
             phi: n
           });
@@ -3918,11 +3918,11 @@ var vs = "Complex", ps = [], ds = /* @__PURE__ */ ee(vs, ps, () => (Object.defin
     default:
       throw new SyntaxError("Wrong number of arguments in function fromPolar");
   }
-}, Ze.prototype.valueOf = Ze.prototype.toString, Ze.fromJSON = function(e) {
-  return new Ze(e);
-}, Ze.compare = function(e, i) {
+}, Ye.prototype.valueOf = Ye.prototype.toString, Ye.fromJSON = function(e) {
+  return new Ye(e);
+}, Ye.compare = function(e, i) {
   return e.re > i.re ? 1 : e.re < i.re ? -1 : e.im > i.im ? 1 : e.im < i.im ? -1 : 0;
-}, Ze), {
+}, Ye), {
   isClass: !0
 }), ia = { exports: {} };
 /**
@@ -8609,7 +8609,7 @@ function Jl(e, i, t) {
   }
   return a[c] = f, r.splice(f, r.length - f), n && n.splice(f, n.length - f), f;
 }
-function Dr(e) {
+function wr(e) {
   return -e - 2;
 }
 var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee(Ql, Xl, (e) => {
@@ -8637,7 +8637,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
       for (P = 1; P <= me + 1; P++) {
         for (P > me ? (G = K, ne = he, k = w[F + K] - me) : (G = y[he++], ne = D[G], k = w[F + G]), $ = 1; $ <= k; $++)
           z = y[ne++], !((U = w[b + z]) <= 0) && (Ae += U, w[b + z] = -U, y[Ee++] = z, w[C + z] !== -1 && (L[w[C + z]] = L[z]), L[z] !== -1 ? w[C + L[z]] = w[C + z] : w[S + w[N + z]] = w[C + z]);
-        G !== K && (D[G] = Dr(K), w[I + G] = 0);
+        G !== K && (D[G] = wr(K), w[I + G] = 0);
       }
       for (me !== 0 && (A = Ee), w[N + K] = Ae, D[K] = be, w[F + K] = Ee - be, w[M + K] = -2, x = c(x, p, w, I, g), Q = be; Q < Ee; Q++)
         if (z = y[Q], !((X = w[M + z]) <= 0)) {
@@ -8650,7 +8650,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
         for (z = y[Q], J = D[z], oe = J + w[M + z] - 1, j = J, fe = 0, le = 0, he = J; he <= oe; he++)
           if (G = y[he], w[I + G] !== 0) {
             var Ve = w[I + G] - x;
-            Ve > 0 ? (le += Ve, y[j++] = G, fe += G) : (D[G] = Dr(K), w[I + G] = 0);
+            Ve > 0 ? (le += Ve, y[j++] = G, fe += G) : (D[G] = wr(K), w[I + G] = 0);
           }
         w[M + z] = j - J + 1;
         var B = j, _ = J + w[F + z];
@@ -8659,7 +8659,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
           var O = w[b + V];
           O <= 0 || (le += O, y[j++] = V, fe += V);
         }
-        le === 0 ? (D[z] = Dr(K), U = -w[b + z], Ae -= U, we += U, Z += U, w[b + z] = 0, w[M + z] = -1) : (w[N + z] = Math.min(w[N + z], le), y[j] = y[B], y[B] = y[J], y[J] = K, w[F + z] = j - J + 1, fe = (fe < 0 ? -fe : fe) % g, w[C + z] = w[T + fe], w[T + fe] = z, L[z] = fe);
+        le === 0 ? (D[z] = wr(K), U = -w[b + z], Ae -= U, we += U, Z += U, w[b + z] = 0, w[M + z] = -1) : (w[N + z] = Math.min(w[N + z], le), y[j] = y[B], y[B] = y[J], y[J] = K, w[F + z] = j - J + 1, fe = (fe < 0 ? -fe : fe) % g, w[C + z] = w[T + fe], w[T + fe] = z, L[z] = fe);
       }
       for (w[N + K] = Ae, p = Math.max(p, Ae), x = c(x + p, p, w, I, g), Q = be; Q < Ee; Q++)
         if (z = y[Q], !(w[b + z] >= 0))
@@ -8671,7 +8671,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
               var H = w[F + V] === k && w[M + V] === X;
               for (he = D[V] + 1; H && he <= D[V] + k - 1; he++)
                 w[I + y[he]] !== x && (H = 0);
-              H ? (D[V] = Dr(z), w[b + z] += w[b + V], w[b + V] = 0, w[M + V] = -1, V = w[C + V], w[C + R] = V) : (R = V, V = w[C + V]);
+              H ? (D[V] = wr(z), w[b + z] += w[b + V], w[b + V] = 0, w[M + V] = -1, V = w[C + V], w[C + R] = V) : (R = V, V = w[C + V]);
             }
           }
       for (he = be, Q = be; Q < Ee; Q++)
@@ -8679,7 +8679,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
       w[b + K] = we, (w[F + K] = he - be) === 0 && (D[K] = -1, w[I + K] = 0), me !== 0 && (A = he);
     }
     for (z = 0; z < g; z++)
-      D[z] = Dr(D[z]);
+      D[z] = wr(D[z]);
     for (V = 0; V <= g; V++)
       w[S + V] = -1;
     for (V = g; V >= 0; V--)
@@ -8720,7 +8720,7 @@ var Ql = "csAmd", Xl = ["add", "multiply", "transpose"], Hl = /* @__PURE__ */ ee
       if (w === 0)
         o[v + E] = -2, A++, s[E] = -1, o[g + E] = 0;
       else if (w > p)
-        o[m + E] = 0, o[v + E] = -1, A++, s[E] = Dr(h), o[m + h]++;
+        o[m + E] = 0, o[v + E] = -1, A++, s[E] = wr(h), o[m + h]++;
       else {
         var F = o[d + w];
         F !== -1 && (y[F] = E), o[D + E] = o[d + w], o[d + w] = E;
@@ -8852,10 +8852,10 @@ function Ht(e, i) {
   return e[i] < 0;
 }
 function Ea(e, i) {
-  e[i] = Dr(e[i]);
+  e[i] = wr(e[i]);
 }
 function di(e) {
-  return e < 0 ? Dr(e) : e;
+  return e < 0 ? wr(e) : e;
 }
 function n0(e, i, t, n, r) {
   var a = i._index, u = i._ptr, c = i._size, f = c[1], h, s, o, l = 0;
@@ -9875,7 +9875,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
 }), Oe = /* @__PURE__ */ Tc({
   matrix: ye,
   typed: ce
-}), Ye = /* @__PURE__ */ qc({
+}), Ze = /* @__PURE__ */ qc({
   BigNumber: et,
   config: je,
   matrix: ye,
@@ -9893,7 +9893,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   SparseMatrix: Gr,
   matrix: ye,
   typed: ce
-}), dr = /* @__PURE__ */ Vc({
+}), mr = /* @__PURE__ */ Vc({
   numeric: T0,
   typed: ce
 }), Ma = /* @__PURE__ */ kc({
@@ -9920,7 +9920,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   typed: ce
 }), q0 = /* @__PURE__ */ Jc({
   DenseMatrix: Qe,
-  divideScalar: dr,
+  divideScalar: mr,
   equalScalar: cr,
   matrix: ye,
   multiplyScalar: br,
@@ -9935,7 +9935,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   addScalar: Fr,
   complex: on,
   conj: It,
-  divideScalar: dr,
+  divideScalar: mr,
   equal: Ma,
   identity: it,
   isZero: Fa,
@@ -9946,7 +9946,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   subtractScalar: xr,
   typed: ce,
   unaryMinus: tt,
-  zeros: Ye
+  zeros: Ze
 }), at = /* @__PURE__ */ rl({
   DenseMatrix: Qe,
   concat: _r,
@@ -9963,7 +9963,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   unaryMinus: tt
 }), Ba = /* @__PURE__ */ Xc({
   DenseMatrix: Qe,
-  divideScalar: dr,
+  divideScalar: mr,
   equalScalar: cr,
   matrix: ye,
   multiplyScalar: br,
@@ -10006,7 +10006,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   SparseMatrix: Gr,
   abs: rt,
   add: rr,
-  divideScalar: dr,
+  divideScalar: mr,
   larger: Zr,
   largerEq: Na,
   multiply: ie,
@@ -10017,17 +10017,17 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   add: rr,
   matrix: ye,
   typed: ce,
-  zeros: Ye
+  zeros: Ze
 }), V0 = /* @__PURE__ */ Kc({
   DenseMatrix: Qe,
-  divideScalar: dr,
+  divideScalar: mr,
   equalScalar: cr,
   matrix: ye,
   multiplyScalar: br,
   subtractScalar: xr,
   typed: ce
 }), G0 = /* @__PURE__ */ m0({
-  divideScalar: dr,
+  divideScalar: mr,
   isZero: Fa,
   matrix: ye,
   multiply: ie,
@@ -10046,7 +10046,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   config: je,
   matrix: ye,
   typed: ce
-}), wr = /* @__PURE__ */ yc({
+}), pr = /* @__PURE__ */ yc({
   bignumber: un,
   matrix: ye,
   add: rr,
@@ -10064,13 +10064,13 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
 }), Q0 = /* @__PURE__ */ fc({
   Index: _a,
   matrix: ye,
-  range: wr,
+  range: pr,
   typed: ce
 }), tr = /* @__PURE__ */ D0({
   abs: rt,
   addScalar: Fr,
   det: G0,
-  divideScalar: dr,
+  divideScalar: mr,
   identity: it,
   matrix: ye,
   multiply: ie,
@@ -10082,7 +10082,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   SparseMatrix: Gr,
   abs: rt,
   addScalar: Fr,
-  divideScalar: dr,
+  divideScalar: mr,
   equalScalar: cr,
   larger: Zr,
   matrix: ye,
@@ -10119,7 +10119,7 @@ var A0 = "eigs", E0 = ["config", "typed", "matrix", "addScalar", "equal", "subtr
   config: je,
   cos: b0,
   diag: O0,
-  divideScalar: dr,
+  divideScalar: mr,
   dot: xa,
   equal: Ma,
   flatten: Sa,
@@ -10216,7 +10216,7 @@ class k0 {
     if (this.lcs == null)
       return it(t);
     {
-      const n = Ye([t, t]);
+      const n = Ze([t, t]);
       for (let r = 0; r < t; r++) {
         const a = i[r];
         switch (a) {
@@ -10415,7 +10415,7 @@ class eh extends j0 {
       [0, 0, 0, 0, 0, 1]
     ]);
     if (this.domain.getNode(this.nodes[0]).hasLcs() || this.domain.getNode(this.nodes[1]).hasLcs()) {
-      let u = Ye(6);
+      let u = Ze(6);
       u = De(
         u,
         ve([0, 1, 2], [0, 1, 2]),
@@ -10449,7 +10449,7 @@ class eh extends j0 {
       else if (this.hinges[1])
         var g = [0, 1, 2, 3, 4], p = [5];
       const m = v.subset(ve(g, g)), d = v.subset(ve(g, p)), y = v.subset(ve(p, p)), D = nr(m, ie(ie(d, tr(y)), Oe(d)));
-      let A = Ye(6, 6);
+      let A = Ze(6, 6);
       return A = De(A, ve(g, g), D), t ? {
         answer: A,
         a: g,
@@ -10491,13 +10491,13 @@ class eh extends j0 {
     ie(o, f / (1 + h) / (1 + h));
     const l = Math.min(Math.abs(o[1][1]), Math.abs(o[2][2])) / 1e3;
     if (o[0][0] = l, o[0][3] = -l, o[3][0] = -l, o[3][3] = l, this.hasHinges()) {
-      const v = this.computeLocalStiffnessMtrx(!0), g = nt(v.a)[0], p = Ye(6, g);
-      De(p, ve(v.a, wr(0, g)), it(g)), De(
+      const v = this.computeLocalStiffnessMtrx(!0), g = nt(v.a)[0], p = Ze(6, g);
+      De(p, ve(v.a, pr(0, g)), it(g)), De(
         p,
-        ve(v.b, wr(0, g)),
+        ve(v.b, pr(0, g)),
         ie(ie(tr(v.kbb), Oe(v.kab)), -1)
       );
-      const m = ie(Oe(p), ie(o, p)), d = Ye(6, 6);
+      const m = ie(Oe(p), ie(o, p)), d = Ze(6, 6);
       return De(v.a, ve(v.a, v.a), m), d;
     }
     return o;
@@ -10566,7 +10566,7 @@ class eh extends j0 {
     let a = ie(n, De(t.r, ve(r)));
     if (this.hasHinges()) {
       const u = this.computeLocalStiffnessMtrx(!0);
-      let c = Ye(6);
+      let c = Ze(6);
       for (const f of t.getElementLoadsOnElement(this.label))
         c = rr(c, f.getLoadVectorForClampedBeam());
       this.hasHinges() && (a = De(
@@ -10592,7 +10592,7 @@ class eh extends j0 {
    */
   computeEndForces(t) {
     const n = this.computeT(), r = this.getLocationArray(), a = ie(n, De(t.r, ve(r))), u = this.computeLocalStiffnessMtrx(!0);
-    let c = ie(u.answer, a), f = Ye(6);
+    let c = ie(u.answer, a), f = Ze(6);
     for (const h of t.getElementLoadsOnElement(this.label))
       f = rr(f, h.getLoadVectorForClampedBeam());
     if (this.hasHinges()) {
@@ -10718,7 +10718,7 @@ class eh extends j0 {
     const r = this.computeT(), a = this.getLocationArray();
     let u = ie(r, De(t.eigenVectors[n], ve(a)));
     if (this.hasHinges()) {
-      const c = this.computeLocalStiffnessMtrx(!0), f = Ye(6);
+      const c = this.computeLocalStiffnessMtrx(!0), f = Ze(6);
       this.hasHinges() && (u = De(
         u,
         ve(c.b),
@@ -11228,7 +11228,7 @@ class nh extends ut {
     return -this.getLocalIntensities().fz * t * t / 2;
   }
 }
-const ih = 1e-12, mr = (e) => e > 0 ? e : 0, ln = (e) => (e.q1 - e.q0) / (e.b - e.a), Yr = (e) => !(e.b - e.a > ih), Sr = (e, i) => {
+const ih = 1e-12, gr = (e) => e > 0 ? e : 0, ln = (e) => (e.q1 - e.q0) / (e.b - e.a), Yr = (e) => !(e.b - e.a > ih), Sr = (e, i) => {
   if (Yr(e))
     return 0;
   const t = ln(e), n = e.q0 - t * e.a, { a: r, b: a } = e;
@@ -11264,7 +11264,7 @@ const ih = 1e-12, mr = (e) => e > 0 ? e : 0, ln = (e) => (e.q1 - e.q0) / (e.b - 
     u2: n / i
   };
 }, Ta = (e, i) => {
-  const t = ln(e), { a: n, b: r, q0: a, q1: u } = e, c = (v) => a * Math.pow(mr(v - n), 4) / 24 + t * Math.pow(mr(v - n), 5) / 120 - u * Math.pow(mr(v - r), 4) / 24 - t * Math.pow(mr(v - r), 5) / 120, f = (v) => a * Math.pow(mr(v - n), 3) / 6 + t * Math.pow(mr(v - n), 4) / 24 - u * Math.pow(mr(v - r), 3) / 6 - t * Math.pow(mr(v - r), 4) / 24, h = c(i), s = f(i), o = 12 * h / (i * i * i) - 6 * s / (i * i), l = 2 * s / i - 6 * h / (i * i);
+  const t = ln(e), { a: n, b: r, q0: a, q1: u } = e, c = (v) => a * Math.pow(gr(v - n), 4) / 24 + t * Math.pow(gr(v - n), 5) / 120 - u * Math.pow(gr(v - r), 4) / 24 - t * Math.pow(gr(v - r), 5) / 120, f = (v) => a * Math.pow(gr(v - n), 3) / 6 + t * Math.pow(gr(v - n), 4) / 24 - u * Math.pow(gr(v - r), 3) / 6 - t * Math.pow(gr(v - r), 4) / 24, h = c(i), s = f(i), o = 12 * h / (i * i * i) - 6 * s / (i * i), l = 2 * s / i - 6 * h / (i * i);
   return { p: c, dp: f, c2: l, c3: o };
 }, uh = (e, i, t) => {
   if (Yr(e))
@@ -11691,7 +11691,7 @@ class mh {
 }
 class wh extends mh {
   assemble() {
-    this.k = Ye(this.neq + this.pneq, this.neq + this.pneq);
+    this.k = Ze(this.neq + this.pneq, this.neq + this.pneq);
     for (const [i, t] of this.domain.elements) {
       const n = t.computeStiffness(), r = t.getLocationArray(), a = nt(r)[0];
       for (let u = 0; u < a; u++) {
@@ -11702,9 +11702,9 @@ class wh extends mh {
         }
       }
     }
-    this.fNodal = Ye(this.neq + this.pneq, this.loadCases.length), this.fElement = Ye(this.neq + this.pneq, this.loadCases.length);
+    this.fNodal = Ze(this.neq + this.pneq, this.loadCases.length), this.fElement = Ze(this.neq + this.pneq, this.loadCases.length);
     for (let i = 0; i < this.loadCases.length; i++) {
-      this.loadCases[i].r = Ye(this.neq + this.pneq);
+      this.loadCases[i].r = Ze(this.neq + this.pneq);
       const t = this.loadCases[i];
       for (const n of t.nodalLoadList)
         n.active && this.assembleVecLC(this.fNodal, n.getLoadVector(), n.getLocationArray(), i);
@@ -11714,6 +11714,20 @@ class wh extends mh {
         n.active && this.assembleVec(t.r, n.getNodePrescribedDisplacementVector(), n.getLocationArray());
     }
     this.f = rr(this.fNodal, this.fElement);
+  }
+  /**
+   * What a prescribed equation's solved displacement couples back into the free block:
+   * `K[free,prescribed] · r[prescribed]`. Zero wherever nothing is prescribed, or every
+   * prescribed value is zero - the ordinary case of a plain support rather than a settlement.
+   *
+   * `rightHandSide()` subtracts exactly this from `f[free]` to get `b`; public so a reader can
+   * see the correction on its own rather than only its effect on `b`.
+   */
+  prescribedCoupling(i) {
+    if (this.neq === 0)
+      return Ze(0);
+    const t = pr(0, this.neq), n = pr(this.neq, this.neq + this.pneq), r = De(this.loadCases[i].r, ve(n));
+    return ie(De(this.k, ve(t, n)), r);
   }
   /**
    * What the free block is actually solved against, for one load case.
@@ -11730,15 +11744,15 @@ class wh extends mh {
    */
   rightHandSide(i) {
     if (this.neq === 0)
-      return Ye(0);
-    const t = wr(0, this.neq), n = wr(this.neq, this.neq + this.pneq), r = De(this.loadCases[i].r, ve(n)), a = ie(De(this.k, ve(t, n)), r);
-    let u = De(this.f, ve(t, [i]));
-    return typeof u == "number" && (u = ye([u])), nr(Mr(u), a);
+      return Ze(0);
+    const t = pr(0, this.neq);
+    let n = De(this.f, ve(t, [i]));
+    return typeof n == "number" && (n = ye([n])), nr(Mr(n), this.prescribedCoupling(i));
   }
   solve() {
     const i = /* @__PURE__ */ new Date();
     this.codeNumberGenerated || this.generateCodeNumbers();
-    const t = wr(0, this.neq), n = wr(this.neq, this.neq + this.pneq);
+    const t = pr(0, this.neq), n = pr(this.neq, this.neq + this.pneq);
     if (this.assemble(), this.neq > 0)
       for (let u = 0; u < this.loadCases.length; u++) {
         this.loadCases[u].solved = !1;
@@ -11746,7 +11760,7 @@ class wh extends mh {
         let f = De(this.k, ve(t, t));
         typeof f == "number" && (f = ye([[f]]));
         const h = Mr(K0(f, c));
-        this.loadCases[u].r = De(this.loadCases[u].r, ve(wr(0, this.neq)), h), this.loadCases[u].R = De(ie(this.k, this.loadCases[u].r), ve(n)), this.loadCases[u].R = nr(
+        this.loadCases[u].r = De(this.loadCases[u].r, ve(pr(0, this.neq)), h), this.loadCases[u].R = De(ie(this.k, this.loadCases[u].r), ve(n)), this.loadCases[u].R = nr(
           this.loadCases[u].R,
           Mr(De(this.f, ve(n, [u])))
         ), this.loadCases[u].solved = !0;
@@ -11777,9 +11791,9 @@ class gh {
     se(this, "elementLoadList", new Array());
     se(this, "prescribedBC", new Array());
     // solution vector
-    se(this, "r", Ye(0));
+    se(this, "r", Ze(0));
     // vector of reactions
-    se(this, "R", Ye(0));
+    se(this, "R", Ze(0));
     // omegas
     se(this, "eigenNumbers", []);
     se(this, "eigenVectors", []);
