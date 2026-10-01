@@ -51,3 +51,30 @@ test("0 uknowns - Cantilever-Cantilever", () => {
   expect(defl.w[5]).toBeCloseTo((1000 * 1 * 1 * 1 * 1) / 384 / 210000e6 / 8.356e-5);
   expect(bm.M[5]).toBeCloseTo((1000 * 1 * 1) / 24);
 });
+
+test("a settlement with no load: f is zero, but the coupling it drives into b is not", () => {
+  const solver = new LinearStaticSolver();
+  solver.domain.createNode(1, [0, 0, 0], [DofID.Dx, DofID.Dz, DofID.Ry]);
+  solver.domain.createNode(2, [1, 0, 0], [DofID.Dz]);
+
+  solver.domain.createBeam2D("1", [1, 2], 1, 1, [false, false]);
+
+  solver.domain.createMaterial("1", { e: 210000e6, g: 210000e6 / (2 * (1 + 0.2)), alpha: 1.0, d: 4000 /*kg/m3!!!*/ });
+  solver.domain.createCrossSection("1", { a: 1, iy: 8.356e-5, iz: 1.0, dyz: 999991.0, h: 1, k: 1e32, j: 99999.0 });
+
+  // no nodal load, no element load - f stays zero everywhere
+  solver.loadCases[0].createPrescribedDisplacement(2, { [DofID.Dz]: -0.01 });
+
+  solver.solve();
+
+  const f = math.subset(solver.f, math.index(math.range(0, solver.neq), [0])) as math.Matrix;
+  expect((math.squeeze(f) as math.Matrix).toArray()).toEqual(Array(solver.neq).fill(0));
+
+  const coupling = solver.prescribedCoupling(0);
+  const b = solver.rightHandSide(0);
+
+  // the coupling alone is what makes b nonzero, since f contributed nothing
+  const couplingValues = coupling.toArray() as number[];
+  expect(couplingValues.some((v) => v !== 0)).toBe(true);
+  (b.toArray() as number[]).forEach((value, i) => expect(value).toBeCloseTo(-couplingValues[i]));
+});
