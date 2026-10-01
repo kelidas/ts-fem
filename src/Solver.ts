@@ -11,6 +11,9 @@ export abstract class Solver {
   k: math.Matrix;
   m: math.Matrix;
   f: math.MathCollection | number[] | number[][];
+  /** `f`'s two parts: what a direct nodal load contributes, and what an element load's own work-equivalent nodal forces contribute. Their sum is `f`. */
+  fNodal: math.MathCollection | number[] | number[][];
+  fElement: math.MathCollection | number[] | number[][];
   loadCases = new Array<LoadCase>();
   codeNumberGenerated: boolean = false;
 
