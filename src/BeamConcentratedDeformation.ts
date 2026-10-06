@@ -3,13 +3,14 @@ import { Beam2D } from "./Beam2D";
 import { BeamElementLoad } from "./BeamElementLoad";
 import { Domain } from "./Domain";
 import { LabelType } from ".";
+import { deflectionShape, rotationShape, shearParameter, slopeShape } from "./TimoshenkoShape";
 
 // Local Timoshenko beam stiffness matrix for an arbitrary sub-length, used to
 // split the element at the imposed deformation point (see getSegmentEndDisplacements).
 function computeLocalStiffness(l: number, e: number, g: number, area: number, iy: number, k: number): math.Matrix {
   const l2 = l * l;
   const l3 = l2 * l;
-  const fi = (12 * e * iy) / (k * g * area * l * l);
+  const fi = shearParameter(l, e, g, area, iy, k);
   const fi1 = 1 + fi;
   return math.matrix([
     [(e * area) / l, 0, 0, -(e * area) / l, 0, 0],
@@ -193,50 +194,68 @@ export class BeamConcentratedDeformation extends BeamElementLoad {
     }
   }
 
-  // Deflection of the clamped-clamped primary structure (r_A=r_B=0), interpolated with
-  // standard Hermite shape functions on each side of the imposed deformation point.
-  computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+  /**
+   * The sub-beam a normalized position falls in, and what the shape functions of a Timoshenko beam
+   * need of it: where the point is along it, its length, its shear parameter, and its end
+   * displacements (w1, phi1, w2, phi2). Sub-beam a starts at the clamped first node, sub-beam b
+   * ends at the clamped second one.
+   */
+  private subBeamAt(xl: number) {
     const { a, b, l, rC1, rC2 } = this.getSegmentEndDisplacements();
+    const elem = this.domain.getElement(this.target);
+    const mat = elem.getMaterial();
+    const cs = elem.getCS();
+    // a sub-beam of no length has no field to interpolate, and a shear parameter that is infinite
+    const fi = (length: number) => (length === 0 ? 0 : shearParameter(length, mat.e, mat.g, cs.a, cs.iy, cs.k));
     const x = xl * l;
 
     if (x <= a) {
-      const xi = a === 0 ? 0 : x / a;
-      const u = xi * rC1[0];
-      const w = (3 * xi * xi - 2 * xi * xi * xi) * rC1[1] + a * (xi * xi - xi * xi * xi) * rC1[2];
-      return { u, w };
-    } else {
-      const xb = x - a;
-      const xi = b === 0 ? 0 : xb / b;
-      const u = (1 - xi) * rC2[0];
-      const w = (1.0 - 3.0 * xi * xi + 2.0 * xi * xi * xi) * rC2[1] + b * (-xi + 2.0 * xi * xi - xi * xi * xi) * rC2[2];
-      return { u, w };
+      return { first: true, xi: a === 0 ? 0 : x / a, length: a, fi: fi(a), ends: [0, 0, rC1[1], rC1[2]], u: rC1[0] };
     }
+
+    return {
+      first: false,
+      xi: b === 0 ? 0 : (x - a) / b,
+      length: b,
+      fi: fi(b),
+      ends: [rC2[1], rC2[2], 0, 0],
+      u: rC2[0],
+    };
+  }
+
+  private static dot(shape: number[], ends: number[]): number {
+    return shape[0] * ends[0] + shape[1] * ends[1] + shape[2] * ends[2] + shape[3] * ends[3];
+  }
+
+  // Deflection of the clamped-clamped primary structure (r_A=r_B=0), interpolated on each side of
+  // the imposed deformation point with the shape functions of a Timoshenko beam of that length.
+  computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+    const s = this.subBeamAt(xl);
+    const u = (s.first ? s.xi : 1 - s.xi) * s.u;
+    const w = BeamConcentratedDeformation.dot(deflectionShape(s.xi, s.length, s.fi), s.ends);
+
+    return { u, w };
   }
 
   /**
    * The derivative of the deflection above, taken within whichever sub-beam the point falls in.
    *
-   * Each sub-beam has its own normalized coordinate, so each brings its own length out of the
-   * derivative. A sub-beam of no length is the degenerate case the deflection already guards: there
-   * is no interval to differentiate over, and the slope belongs to the other one.
+   * A sub-beam of no length is the degenerate case the deflection already guards: there is no
+   * interval to differentiate over, and the slope belongs to the other one.
    */
   computeBeamSlopeContrib(xl: number): number {
-    const { a, b, l, rC1, rC2 } = this.getSegmentEndDisplacements();
-    const x = xl * l;
+    const s = this.subBeamAt(xl);
+    if (s.length === 0) return 0;
 
-    if (x <= a) {
-      if (a === 0) return 0;
+    return BeamConcentratedDeformation.dot(slopeShape(s.xi, s.length, s.fi), s.ends);
+  }
 
-      const xi = x / a;
+  /** The rotation of the cross section, from the same sub-beam - minus the slope only without shear. */
+  computeBeamRotationContrib(xl: number): number {
+    const s = this.subBeamAt(xl);
+    if (s.length === 0) return 0;
 
-      return ((6 * xi - 6 * xi * xi) / a) * rC1[1] + (2 * xi - 3 * xi * xi) * rC1[2];
-    }
-
-    if (b === 0) return 0;
-
-    const xi = (x - a) / b;
-
-    return ((-6 * xi + 6 * xi * xi) / b) * rC2[1] + (-1 + 4 * xi - 3 * xi * xi) * rC2[2];
+    return BeamConcentratedDeformation.dot(rotationShape(s.xi, s.length, s.fi), s.ends);
   }
 
   // An imposed deformation is a "dislocation": it produces a jump in displacement, not

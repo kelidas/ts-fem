@@ -14,12 +14,19 @@ export class BeamElementLoad extends Load {
   /**
    * The slope this load adds to the deflection curve, dw/dx, at a normalized position.
    *
-   * The rotation of a cross section is minus this. It is kept as a slope rather than as a rotation
-   * so that the sign convention is settled once, where the terms are summed, rather than in every
-   * load that contributes one.
+   * Where shear does not deform the beam, the rotation of a cross section is minus this.
    */
   computeBeamSlopeContrib(xl: number): number {
     return 0;
+  }
+  /**
+   * The rotation of the cross section this load adds, at a normalized position.
+   *
+   * Minus the slope, unless the load's own field lets the shear strain differ from zero, in which
+   * case the load says so by overriding this.
+   */
+  computeBeamRotationContrib(xl: number): number {
+    return -this.computeBeamSlopeContrib(xl);
   }
   computeBeamNContrib(x: number): number {
     return 0;

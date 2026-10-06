@@ -4,6 +4,7 @@ import { LoadCase } from "./LoadCase";
 import { DofID, LabelType } from ".";
 import { Element } from "./Element";
 import { BeamElementLoad } from "./BeamElementLoad";
+import { deflectionShape, rotationShape, shearParameter } from "./TimoshenkoShape";
 
 /**
  * Implementation of Timoshenko beam element in 2D (xz plane)
@@ -405,13 +406,23 @@ export class Beam2D extends Element {
     return fe;
   }
 
-  // Hermite-interpolated local deflection at normalized position xl in [0,1], plus load contributions
+  /** The shear parameter of the element, which the shape functions between its ends depend on. */
+  private computeShearParameter(l: number): number {
+    const mat = this.getMaterial();
+    const cs = this.getCS();
+
+    return shearParameter(l, mat.e, mat.g, cs.a, cs.iy, cs.k);
+  }
+
+  /** The end displacements bending acts on, (w1, phi1, w2, phi2), dotted with a shape. */
+  private interpolateBending(rl: math.Matrix, shape: [number, number, number, number]): number {
+    return shape[0] * rl.get([1]) + shape[1] * rl.get([2]) + shape[2] * rl.get([4]) + shape[3] * rl.get([5]);
+  }
+
+  // Local deflection at normalized position xl in [0,1], interpolated with the Timoshenko shape
+  // functions the stiffness matrix is built from, plus load contributions
   private evalLocalDeflAt(rl: math.Matrix, l: number, xl: number, eloads: Array<BeamElementLoad>) {
-    let w =
-      (1.0 - 3.0 * xl * xl + 2.0 * xl * xl * xl) * rl.get([1]) +
-      l * (-xl + 2.0 * xl * xl - xl * xl * xl) * rl.get([2]) +
-      (3.0 * xl * xl - 2.0 * xl * xl * xl) * rl.get([4]) +
-      l * (xl * xl - xl * xl * xl) * rl.get([5]);
+    let w = this.interpolateBending(rl, deflectionShape(xl, l, this.computeShearParameter(l)));
     let u = (1 - xl) * rl.get([0]) + xl * rl.get([3]);
 
     for (const load of eloads) {
@@ -482,32 +493,27 @@ export class Beam2D extends Element {
   }
 
   /**
-   * The slope of the deflection curve, dw/dx, at a normalized position.
+   * The rotation of the cross section at a normalized position.
    *
-   * The Hermite polynomials of `evalLocalDeflAt` differentiated term by term. They are written in
-   * x/l, so each brings a factor of the length out with it - which is why the two translation terms
-   * are divided by it and the two rotation terms are not.
+   * It has shape functions of its own rather than being minus the slope of the deflection: with
+   * shear deformable, the two differ by the shear strain.
    */
-  private evalLocalSlopeAt(rl: math.Matrix, l: number, xl: number, eloads: Array<BeamElementLoad>) {
-    let slope =
-      ((-6.0 * xl + 6.0 * xl * xl) * rl.get([1])) / l +
-      (-1.0 + 4.0 * xl - 3.0 * xl * xl) * rl.get([2]) +
-      ((6.0 * xl - 6.0 * xl * xl) * rl.get([4])) / l +
-      (2.0 * xl - 3.0 * xl * xl) * rl.get([5]);
+  private evalLocalRotationAt(rl: math.Matrix, l: number, xl: number, eloads: Array<BeamElementLoad>) {
+    let phi = this.interpolateBending(rl, rotationShape(xl, l, this.computeShearParameter(l)));
 
     for (const load of eloads) {
-      slope += load.computeBeamSlopeContrib(xl);
+      phi += load.computeBeamRotationContrib(xl);
     }
 
-    return slope;
+    return phi;
   }
 
   /**
    * Computes the rotation of the cross section at a single point along the element
    *
-   * The rotation is minus the slope of the deflection curve, which is the convention the end
-   * displacement vector already uses: asked at either end, this returns the nodal rotation the
-   * solver found there.
+   * Where shear does not deform the beam, the rotation is minus the slope of the deflection curve,
+   * which is the convention the end displacement vector already uses: asked at either end, this
+   * returns the nodal rotation the solver found there.
    *
    * A rotation about y is the same number in the element's axes and in the global ones - turning
    * the plane does not turn the section within it - so there is no global counterpart to this.
@@ -521,7 +527,7 @@ export class Beam2D extends Element {
     const l = geo.l;
     const eloads = lc.getElementLoadsOnElement(this.label);
 
-    return -this.evalLocalSlopeAt(rl, l, x / l, eloads);
+    return this.evalLocalRotationAt(rl, l, x / l, eloads);
   }
 
   /**
@@ -537,7 +543,7 @@ export class Beam2D extends Element {
 
     const phi: number[] = [];
     for (let iseg = 0; iseg <= nseg; iseg++) {
-      phi.push(-this.evalLocalSlopeAt(rl, l, iseg / nseg, eloads));
+      phi.push(this.evalLocalRotationAt(rl, l, iseg / nseg, eloads));
     }
 
     return phi;
