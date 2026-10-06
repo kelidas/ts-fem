@@ -1,13 +1,13 @@
 import * as math from "mathjs";
 import { Beam2D } from "./Beam2D";
-import { BeamElementLoad } from "./BeamElementLoad";
+import { ShearCorrectedBeamLoad } from "./ShearCorrectedBeamLoad";
 import { Domain } from "./Domain";
 import { LabelType } from ".";
 
 /**
  * Implementation of Beam2d uniform load
  */
-export class BeamElementUniformEdgeLoad extends BeamElementLoad {
+export class BeamElementUniformEdgeLoad extends ShearCorrectedBeamLoad {
   values: number[]; // fx, fz intensities
   lcs: boolean; // true if values in element local c.s (along length)
   constructor(elem: LabelType, domain: Domain, values: number[], lcs: boolean) {
@@ -54,7 +54,7 @@ export class BeamElementUniformEdgeLoad extends BeamElementLoad {
   }
 
   // in local c.s
-  getLoadVectorForClampedBeam(): Array<number> {
+  protected getBernoulliLoadVector(): Array<number> {
     const geo = this.domain.getElement(this.target).computeGeo();
     const f = this.getLocalIntensities();
     const fx = f.fx;
@@ -102,7 +102,7 @@ export class BeamElementUniformEdgeLoad extends BeamElementLoad {
     }
   }
 
-  computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+  protected computeBernoulliDeflection(xl: number): { u: number; w: number } {
     const f = this.getLocalIntensities();
     const elem = this.domain.elements.get(this.target);
     const geo = elem.computeGeo();
@@ -117,7 +117,7 @@ export class BeamElementUniformEdgeLoad extends BeamElementLoad {
    * The derivative of the deflection above, term by term: the fourth power falls to a third, and
    * the factor of the length falls with it because the polynomial is in x/l and this is in x.
    */
-  computeBeamSlopeContrib(xl: number): number {
+  protected computeBernoulliSlope(xl: number): number {
     const f = this.getLocalIntensities();
     const elem = this.domain.elements.get(this.target);
     const geo = elem.computeGeo();
@@ -138,5 +138,8 @@ export class BeamElementUniformEdgeLoad extends BeamElementLoad {
   computeBeamMContrib(x: number): number {
     const f = this.getLocalIntensities();
     return (-f.fz * x * x) / 2.0;
+  }
+  protected computeBeamShearIntegral(x: number): number {
+    return this.computeBeamMContrib(x);
   }
 }

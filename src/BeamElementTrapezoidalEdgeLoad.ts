@@ -1,13 +1,13 @@
 import * as math from "mathjs";
 import { Beam2D } from "./Beam2D";
-import { BeamElementLoad } from "./BeamElementLoad";
+import { ShearCorrectedBeamLoad } from "./ShearCorrectedBeamLoad";
 import { Domain } from "./Domain";
 import { LabelType } from ".";
 
 /**
  * Implementation of Beam2d trapezoidal (linearly varying) load
  */
-export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
+export class BeamElementTrapezoidalEdgeLoad extends ShearCorrectedBeamLoad {
     startValues: [number, number]; // fx, fz at element start
     endValues: [number, number]; // fx, fz at element end
     lcs: boolean; // true if values provided in element local c.s.
@@ -57,7 +57,7 @@ export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
     }
 
     // load vector in local c.s.
-    getLoadVectorForClampedBeam(): Array<number> {
+    protected getBernoulliLoadVector(): Array<number> {
         const geo = this.domain.getElement(this.target).computeGeo();
         const l = geo.l;
         const intensities = this.getLocalIntensities();
@@ -111,7 +111,7 @@ export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
         }
     }
 
-    computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+    protected computeBernoulliDeflection(xl: number): { u: number; w: number } {
         const elem = this.domain.getElement(this.target) as Beam2D;
         const geo = elem.computeGeo();
         const l = geo.l;
@@ -131,7 +131,7 @@ export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
     }
 
     /** The derivative of the two polynomials above, in x rather than in x/l. */
-    computeBeamSlopeContrib(xl: number): number {
+    protected computeBernoulliSlope(xl: number): number {
         const elem = this.domain.getElement(this.target) as Beam2D;
         const geo = elem.computeGeo();
         const l = geo.l;
@@ -177,5 +177,8 @@ export class BeamElementTrapezoidalEdgeLoad extends BeamElementLoad {
         const fz1 = intensities.end.fz;
         const deltaFz = fz1 - fz0;
         return -(0.5 * fz0 * x * x + (deltaFz / (6 * l)) * x * x * x);
+    }
+    protected computeBeamShearIntegral(x: number): number {
+        return this.computeBeamMContrib(x);
     }
 }

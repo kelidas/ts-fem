@@ -1,6 +1,6 @@
 import * as math from "mathjs";
 import { Beam2D } from "./Beam2D";
-import { BeamElementLoad } from "./BeamElementLoad";
+import { ShearCorrectedBeamLoad } from "./ShearCorrectedBeamLoad";
 import { Domain } from "./Domain";
 import { LabelType } from ".";
 
@@ -8,7 +8,7 @@ import { LabelType } from ".";
  * Implementation of Beam2d concentrated load
  * Beam2D lives in the XZ plane, so the only supported point moment is My.
  */
-export class BeamConcentratedLoad extends BeamElementLoad {
+export class BeamConcentratedLoad extends ShearCorrectedBeamLoad {
   values: number[]; // Fx, Fz, My, distance x
   lcs: boolean;
 
@@ -56,7 +56,7 @@ export class BeamConcentratedLoad extends BeamElementLoad {
     }
   }
 
-  getLoadVectorForClampedBeam(): Array<number> {
+  protected getBernoulliLoadVector(): Array<number> {
     const geo = this.domain.getElement(this.target).computeGeo();
     const f = this.getLocalIntensities();
     const fx = f.fx;
@@ -111,7 +111,7 @@ export class BeamConcentratedLoad extends BeamElementLoad {
     }
   }
 
-  computeBeamDeflectionContrib(xl: number): { u: number; w: number } {
+  protected computeBernoulliDeflection(xl: number): { u: number; w: number } {
     const f = this.getLocalIntensities();
     const elem = this.domain.elements.get(this.target)!;
     const geo = elem.computeGeo();
@@ -162,7 +162,7 @@ export class BeamConcentratedLoad extends BeamElementLoad {
    * breaks the slope of the moment, and with it the curvature, but not the slope of the deflection,
    * so the two sides agree here while the shear either side of it does not.
    */
-  computeBeamSlopeContrib(xl: number): number {
+  protected computeBernoulliSlope(xl: number): number {
     const f = this.getLocalIntensities();
     const elem = this.domain.elements.get(this.target)!;
     const geo = elem.computeGeo();
@@ -206,5 +206,10 @@ export class BeamConcentratedLoad extends BeamElementLoad {
     const f = this.getLocalIntensities();
     const a = this.values[3];
     return x < a ? 0 : -f.fz * (x - a) - f.my;
+  }
+  protected computeBeamShearIntegral(x: number): number {
+    const f = this.getLocalIntensities();
+    const a = this.values[3];
+    return x < a ? 0 : -f.fz * (x - a);
   }
 }
